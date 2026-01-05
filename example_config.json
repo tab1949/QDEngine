@@ -1,0 +1,23 @@
+{
+	"host": "0.0.0.0",
+	"port": 9000,
+	"data_format": "CSV",
+	"data_file_options": {
+		"futures_contracts": "./data/contracts",
+		"futures_calendar": "./data/calendar",
+		"futures_tick": "./data/ticks",
+		"futures_minute": "./data/minute",
+		"futures_daily_rank": "./data/daily_rank",
+		"options_list": "./data/options_list",
+		"options_tick": "./data/options_ticks"
+	},
+	"data_api_options": {
+		"futures_contracts": "https://example.com/contracts",
+		"futures_calendar": "https://example.com/calendar",
+		"futures_tick": "",
+		"futures_minute": "",
+		"futures_daily_rank": "",
+		"options_list": "",
+		"options_tick": "https://example.com/options/ticks"
+	}
+}
