@@ -109,6 +109,6 @@ async fn handle_new_websocket(mut ws: WebSocket) {
         ).unwrap();
         ws.send(Message::Text(success_report.into())).await.unwrap();
         // Proceed to serve the authenticated WebSocket connection
-        service::serve(ws).await;
+        service::serve(&mut service::Client { ws }).await;
     }
 }

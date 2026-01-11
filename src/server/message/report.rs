@@ -10,9 +10,8 @@ use serde_repr::{
 #[derive(Serialize_repr)]
 #[repr(i64)]
 pub enum ReportCode {
-    AuthenticateFailed = -3,
-    PermissionDenied = -2,
-    UnknownError = -1,
+    AuthenticateFailed = -2,
+    GeneralError = -1,
     Success = 0,
     Handshake = 1,
 }
