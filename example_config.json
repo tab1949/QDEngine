@@ -1,7 +1,8 @@
 {
 	"host": "0.0.0.0",
-	"port": 9000,
+	"port": 8888,
 	"data_format": "CSV",
+	"handshake_timeout": 10000,
 	"data_file_options": {
 		"futures_contracts": "./data/contracts",
 		"futures_calendar": "./data/calendar",

@@ -15,7 +15,13 @@ This file lists the tasks to do.
 
 ## WebSocket Service
 - [ ] Test Instruction Handling
-- [ ] Test Report
+  - [ ] Message Structure
+  - [ ] Error Handling
+  - [ ] Core Process
+- [ ] Test & Report
+  - [ ] Message Structure
+  - [ ] Error Handling
+  - [ ] Testing Process
 - [ ] Data Fetching Agent
   - [ ] Abstraction of Local File
   - [ ] Abstraction of Network Data Services

@@ -32,6 +32,7 @@ pub struct Config {
     pub mode: Option<Mode>,
     pub host: Option<String>,
     pub port: Option<u16>,
+    pub handshake_timeout: Option<u64>,
     pub data_format: Option<DataFormat>,
     #[serde(default)]
     pub data_file_options: DataOptions,
@@ -153,6 +154,9 @@ fn merge_config(base: &mut Config, incoming: Config) {
     if let Some(v) = incoming.data_format {
         base.data_format = Some(v);
     }
+    if let Some(v) = incoming.handshake_timeout {
+        base.handshake_timeout = Some(v);
+    }
 
     merge_data_options(&mut base.data_file_options, &incoming.data_file_options);
     merge_data_options(&mut base.data_api_options, &incoming.data_api_options);
@@ -196,11 +200,12 @@ fn read_config_file(file: &String, config: &mut Config) {
 }
 
 impl Config {
-    pub fn parse(args: &mut std::env::Args) -> Config {
+    pub fn parse(args: std::env::Args) -> Config {
         let mut ret: Config = Config {
             mode: Some(Mode::Server),
             host: Some(String::from("localhost")),
             port: Some(8888),
+            handshake_timeout: Some(10_000),
             data_format: Some(DataFormat::CSV),
             data_file_options: DataOptions {
                 futures_contracts: None,

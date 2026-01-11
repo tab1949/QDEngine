@@ -3,15 +3,15 @@ mod server;
 mod adaptor;
 
 use std::process::ExitCode;
+use std::sync::LazyLock;
+
+static CONFIG: LazyLock<args::Config> = LazyLock::new(|| args::Config::parse(std::env::args()));
 
 #[tokio::main]
 async fn main() -> ExitCode {
-    use args::Config;
     use args::Mode;
 
-    let config = Config::parse(&mut std::env::args());
-
-    match config.mode {
+    match CONFIG.mode {
         Some(Mode::Help) => {
             args::print_help();
             return ExitCode::SUCCESS;
@@ -21,7 +21,8 @@ async fn main() -> ExitCode {
             return ExitCode::SUCCESS;
         }
         Some(Mode::Server) => {
-            server::main_process(&config).await;
+            let server = server::Server::new(&CONFIG);
+            server.main_process().await;
         }
         None => {
             return ExitCode::FAILURE;
