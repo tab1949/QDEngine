@@ -13,3 +13,4 @@ serde_repr = "0.1.20"
 tokio = { version = "1.48.0", features = ["full"] }
 tracing = "0.1.44"
 tracing-subscriber = "0.3.22"
+websocket-lite = "0.5.2"

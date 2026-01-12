@@ -2,6 +2,7 @@ use serde::{
     self,
     Serialize
 };
+use serde_json::Value;
 use serde_repr::{
     self,
     Serialize_repr
@@ -14,6 +15,9 @@ pub enum ReportCode {
     GeneralError = -1,
     Success = 0,
     Handshake = 1,
+    WebCtpMarketDataEvent = 2,
+    WebCtpTradeEvent = 3,
+    WebCtpOperationAck = 4,
 }
 
 #[derive(Serialize)]
@@ -31,4 +35,16 @@ pub struct HandshakeData {
 #[derive(Serialize)]
 pub struct AuthenticateFailedInfo {
     pub reason: String,
+}
+
+#[derive(Serialize)]
+pub struct OperationAck {
+    pub ok: bool,
+}
+
+#[derive(Serialize)]
+pub struct WebCtpEventReport {
+    pub source: String,
+    pub event: String,
+    pub payload: Value,
 }
