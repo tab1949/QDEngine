@@ -259,14 +259,12 @@ fn spawn_trade_listener(
 
 fn serialize_market_event(event: webctp::MarketDataEvent) -> Option<String> {
     let (event_name, payload) = match event {
-        webctp::MarketDataEvent::Ready { err, info } => (
-            "ready",
-            serde_json::json!({ "err": err, "info": info }),
-        ),
-        webctp::MarketDataEvent::Performed { err, info } => (
-            "performed",
-            serde_json::json!({ "err": err, "info": info }),
-        ),
+        webctp::MarketDataEvent::Ready { err, info } => {
+            ("ready", serde_json::json!({ "err": err, "info": info }))
+        }
+        webctp::MarketDataEvent::Performed { err, info } => {
+            ("performed", serde_json::json!({ "err": err, "info": info }))
+        }
         webctp::MarketDataEvent::Error { err } => ("error", serde_json::json!({ "err": err })),
         webctp::MarketDataEvent::FrontConnected { err, info } => (
             "front_connected",
@@ -280,22 +278,19 @@ fn serialize_market_event(event: webctp::MarketDataEvent) -> Option<String> {
             "heartbeat_timeout",
             serde_json::json!({ "err": err, "info": info }),
         ),
-        webctp::MarketDataEvent::Login { err, info } => (
-            "login",
-            serde_json::json!({ "err": err, "info": info }),
-        ),
-        webctp::MarketDataEvent::Logout { err, info } => (
-            "logout",
-            serde_json::json!({ "err": err, "info": info }),
-        ),
+        webctp::MarketDataEvent::Login { err, info } => {
+            ("login", serde_json::json!({ "err": err, "info": info }))
+        }
+        webctp::MarketDataEvent::Logout { err, info } => {
+            ("logout", serde_json::json!({ "err": err, "info": info }))
+        }
         webctp::MarketDataEvent::TradingDay { err, info } => (
             "trading_day",
             serde_json::json!({ "err": err, "info": info }),
         ),
-        webctp::MarketDataEvent::Subscribe { err, info } => (
-            "subscribe",
-            serde_json::json!({ "err": err, "info": info }),
-        ),
+        webctp::MarketDataEvent::Subscribe { err, info } => {
+            ("subscribe", serde_json::json!({ "err": err, "info": info }))
+        }
         webctp::MarketDataEvent::Unsubscribe { err, info } => (
             "unsubscribe",
             serde_json::json!({ "err": err, "info": info }),
@@ -307,10 +302,9 @@ fn serialize_market_event(event: webctp::MarketDataEvent) -> Option<String> {
                 "info": info,
             }),
         ),
-        webctp::MarketDataEvent::Unknown { err, raw } => (
-            "unknown",
-            serde_json::json!({ "err": err, "raw": raw }),
-        ),
+        webctp::MarketDataEvent::Unknown { err, raw } => {
+            ("unknown", serde_json::json!({ "err": err, "raw": raw }))
+        }
     };
 
     message::generate_report_string(
@@ -327,23 +321,17 @@ fn serialize_market_event(event: webctp::MarketDataEvent) -> Option<String> {
 
 fn serialize_trade_event(event: webctp::TradeEvent) -> Option<String> {
     let (event_name, payload) = match event {
-        webctp::TradeEvent::Ready { err, info } => (
-            "ready",
-            serde_json::json!({ "err": err, "info": info }),
-        ),
-        webctp::TradeEvent::Performed { err, info } => (
-            "performed",
-            serde_json::json!({ "err": err, "info": info }),
-        ),
+        webctp::TradeEvent::Ready { err, info } => {
+            ("ready", serde_json::json!({ "err": err, "info": info }))
+        }
+        webctp::TradeEvent::Performed { err, info } => {
+            ("performed", serde_json::json!({ "err": err, "info": info }))
+        }
         webctp::TradeEvent::Error { err } => ("error", serde_json::json!({ "err": err })),
-        webctp::TradeEvent::ErrorNull { err } => (
-            "error_null",
-            serde_json::json!({ "err": err }),
-        ),
-        webctp::TradeEvent::ErrorUnknownValue { err } => (
-            "error_unknown_value",
-            serde_json::json!({ "err": err }),
-        ),
+        webctp::TradeEvent::ErrorNull { err } => ("error_null", serde_json::json!({ "err": err })),
+        webctp::TradeEvent::ErrorUnknownValue { err } => {
+            ("error_unknown_value", serde_json::json!({ "err": err }))
+        }
         webctp::TradeEvent::FrontConnected { err, info } => (
             "front_connected",
             serde_json::json!({ "err": err, "info": info }),
@@ -360,14 +348,12 @@ fn serialize_trade_event(event: webctp::TradeEvent) -> Option<String> {
             "authenticate",
             serde_json::json!({ "err": err, "info": info }),
         ),
-        webctp::TradeEvent::Login { err, info } => (
-            "login",
-            serde_json::json!({ "err": err, "info": info }),
-        ),
-        webctp::TradeEvent::Logout { err, info } => (
-            "logout",
-            serde_json::json!({ "err": err, "info": info }),
-        ),
+        webctp::TradeEvent::Login { err, info } => {
+            ("login", serde_json::json!({ "err": err, "info": info }))
+        }
+        webctp::TradeEvent::Logout { err, info } => {
+            ("logout", serde_json::json!({ "err": err, "info": info }))
+        }
         webctp::TradeEvent::SettlementInfo { err, info } => (
             "settlement_info",
             serde_json::json!({
@@ -452,10 +438,9 @@ fn serialize_trade_event(event: webctp::TradeEvent) -> Option<String> {
                 "info": info,
             }),
         ),
-        webctp::TradeEvent::Unknown { err, raw } => (
-            "unknown",
-            serde_json::json!({ "err": err, "raw": raw }),
-        ),
+        webctp::TradeEvent::Unknown { err, raw } => {
+            ("unknown", serde_json::json!({ "err": err, "raw": raw }))
+        }
     };
 
     message::generate_report_string(

@@ -4,9 +4,9 @@ use tracing::{Level, error, info};
 use crate::args;
 
 mod controller;
+mod message;
 mod router;
 mod service;
-mod message;
 
 pub struct Server<'a> {
     config: &'a args::Config,
@@ -14,9 +14,7 @@ pub struct Server<'a> {
 
 impl<'a> Server<'a> {
     pub fn new(config: &'a args::Config) -> Self {
-        Server {
-            config: config
-        }
+        Server { config: config }
     }
 
     pub async fn main_process(&self) {

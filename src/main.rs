@@ -1,6 +1,6 @@
+mod adaptor;
 mod args;
 mod server;
-mod adaptor;
 
 use std::process::ExitCode;
 use std::sync::LazyLock;

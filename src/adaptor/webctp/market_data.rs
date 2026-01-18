@@ -1,8 +1,9 @@
 use futures::{SinkExt, StreamExt};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use websocket_lite::{AsyncNetworkStream, ClientBuilder, Message as WsMessage};
 
-type Socket = websocket_lite::AsyncClient<Box<dyn AsyncNetworkStream + Sync + Send + Unpin + 'static>>;
+type Socket =
+    websocket_lite::AsyncClient<Box<dyn AsyncNetworkStream + Sync + Send + Unpin + 'static>>;
 
 use super::message::{Envelope, MarketData, MdMsgCode};
 use super::{WebCtpError, WebCtpResult};
@@ -15,15 +16,9 @@ pub enum MarketDataEvent {
     FrontConnected { err: Value, info: Value },
     FrontDisconnected { err: Value, info: Value },
     HeartbeatTimeout { err: Value, info: Value },
-    Login {
-        err: Value,
-        info: Value,
-    },
+    Login { err: Value, info: Value },
     Logout { err: Value, info: Value },
-    TradingDay {
-        err: Value,
-        info: Value,
-    },
+    TradingDay { err: Value, info: Value },
     Subscribe { err: Value, info: Value },
     Unsubscribe { err: Value, info: Value },
     MarketData { err: Value, info: MarketData },
@@ -79,8 +74,7 @@ impl MarketDataClient {
     }
 
     pub async fn get_trading_day(&mut self) -> WebCtpResult<()> {
-        self.send_op("get_trading_day", json!({}))
-            .await
+        self.send_op("get_trading_day", json!({})).await
     }
 
     pub async fn disconnect(&mut self) -> WebCtpResult<()> {
@@ -106,7 +100,9 @@ impl MarketDataClient {
                     let env: Envelope = serde_json::from_str(text)?;
                     Ok(Some(parse_market_data(env)?))
                 } else {
-                    Ok(Some(parse_market_data(serde_json::from_slice(msg.data())?)?))
+                    Ok(Some(parse_market_data(serde_json::from_slice(
+                        msg.data(),
+                    )?)?))
                 }
             }
             Some(Err(e)) => Err(WebCtpError::WebSocket(e)),
@@ -121,9 +117,7 @@ fn parse_market_data(env: Envelope) -> WebCtpResult<MarketDataEvent> {
     match msg {
         Value::String(s) => match s.as_str() {
             "ready" => Ok(MarketDataEvent::Ready { err, info }),
-            "parse_error" | "processing_error" | "error" => {
-                Ok(MarketDataEvent::Error { err })
-            }
+            "parse_error" | "processing_error" | "error" => Ok(MarketDataEvent::Error { err }),
             _ => Ok(MarketDataEvent::Unknown {
                 err,
                 raw: Value::String(s),
@@ -138,7 +132,9 @@ fn parse_market_data(env: Envelope) -> WebCtpResult<MarketDataEvent> {
                 Ok(MdMsgCode::Error) => Ok(MarketDataEvent::Error { err }),
                 Ok(MdMsgCode::Connected) => Ok(MarketDataEvent::FrontConnected { err, info }),
                 Ok(MdMsgCode::Disconnected) => Ok(MarketDataEvent::FrontDisconnected { err, info }),
-                Ok(MdMsgCode::HeartbeatTimeout) => Ok(MarketDataEvent::HeartbeatTimeout { err, info }),
+                Ok(MdMsgCode::HeartbeatTimeout) => {
+                    Ok(MarketDataEvent::HeartbeatTimeout { err, info })
+                }
                 Ok(MdMsgCode::Login) => Ok(MarketDataEvent::Login { err, info }),
                 Ok(MdMsgCode::Logout) => Ok(MarketDataEvent::Logout { err, info }),
                 Ok(MdMsgCode::TradingDay) => Ok(MarketDataEvent::TradingDay { err, info }),

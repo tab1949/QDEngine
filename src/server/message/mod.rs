@@ -1,7 +1,4 @@
-use serde::{
-    self, 
-    Deserialize, Serialize
-};
+use serde::{self, Deserialize, Serialize};
 pub mod instruction;
 pub mod report;
 
@@ -40,7 +37,11 @@ pub fn parse_instruction(raw: &str) -> Result<Instruction, serde_json::Error> {
     serde_json::from_str(raw)
 }
 
-pub fn generate_report_string<T: Serialize>(code: report::ReportCode, message: &str, data: T) -> Result<String, serde_json::Error> {
+pub fn generate_report_string<T: Serialize>(
+    code: report::ReportCode,
+    message: &str,
+    data: T,
+) -> Result<String, serde_json::Error> {
     let report = report::Report {
         code: code,
         message: message.to_string(),

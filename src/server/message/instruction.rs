@@ -1,8 +1,6 @@
 use std::str;
 
-use serde::{
-    Deserialize, 
-};
+use serde::Deserialize;
 
 #[derive(Deserialize, Clone)]
 pub struct HandshakeInstruction {
@@ -11,18 +9,18 @@ pub struct HandshakeInstruction {
 
 #[derive(Deserialize, Clone, Copy)]
 enum MarketType {
-    Futures, 
-    FuturesOptions, 
+    Futures,
+    FuturesOptions,
     StockCN,
     StockHK,
-    StockUS
+    StockUS,
 }
 
 #[derive(Deserialize, Clone)]
 pub struct TestRequestInstruction {
-    market:     MarketType,
+    market: MarketType,
     time_begin: String,
-    time_end:   String,
+    time_end: String,
 }
 
 #[derive(Deserialize, Clone)]

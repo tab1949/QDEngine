@@ -1,48 +1,112 @@
 use futures::{SinkExt, StreamExt};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use websocket_lite::{AsyncNetworkStream, ClientBuilder, Message as WsMessage};
 
-type Socket = websocket_lite::AsyncClient<Box<dyn AsyncNetworkStream + Sync + Send + Unpin + 'static>>;
+type Socket =
+    websocket_lite::AsyncClient<Box<dyn AsyncNetworkStream + Sync + Send + Unpin + 'static>>;
 
 use super::message::{
     Envelope, Instrument, OrderDeleteError, OrderDeleteReturnError, OrderDeleted, OrderInsertError,
-    OrderInsertReturnError, OrderInserted, OrderTraded, QueryOrder, SettlementInfo, SettlementInfoConfirm,
-    TradeMsgCode, TradingAccount,
+    OrderInsertReturnError, OrderInserted, OrderTraded, QueryOrder, SettlementInfo,
+    SettlementInfoConfirm, TradeMsgCode, TradingAccount,
 };
 use super::{WebCtpError, WebCtpResult};
 
 #[derive(Debug, Clone)]
 pub enum TradeEvent {
-    Ready { err: Value, info: Value },
-    Performed { err: Value, info: Value },
-    Error { err: Value },
-    ErrorNull { err: Value },
-    ErrorUnknownValue { err: Value },
-    FrontConnected { err: Value, info: Value },
+    Ready {
+        err: Value,
+        info: Value,
+    },
+    Performed {
+        err: Value,
+        info: Value,
+    },
+    Error {
+        err: Value,
+    },
+    ErrorNull {
+        err: Value,
+    },
+    ErrorUnknownValue {
+        err: Value,
+    },
+    FrontConnected {
+        err: Value,
+        info: Value,
+    },
     TradingDay {
         err: Value,
         info: Value,
     },
-    FrontDisconnected { err: Value, info: Value },
-    Authenticate { err: Value, info: Value },
+    FrontDisconnected {
+        err: Value,
+        info: Value,
+    },
+    Authenticate {
+        err: Value,
+        info: Value,
+    },
     Login {
         err: Value,
         info: Value,
     },
-    Logout { err: Value, info: Value },
-    SettlementInfo { err: Value, info: SettlementInfo },
-    SettlementInfoConfirm { err: Value, info: SettlementInfoConfirm },
-    TradingAccount { err: Value, info: TradingAccount },
-    OrderInsertReturnError { err: Value, info: OrderInsertReturnError },
-    OrderInsertError { err: Value, info: OrderInsertError },
-    OrderInserted { err: Value, info: OrderInserted },
-    OrderTraded { err: Value, info: OrderTraded },
-    QueryOrder { err: Value, info: QueryOrder },
-    QueryInstrument { err: Value, info: Instrument },
-    OrderDeleteReturnError { err: Value, info: OrderDeleteReturnError },
-    OrderDeleteError { err: Value, info: OrderDeleteError },
-    OrderDeleted { err: Value, info: OrderDeleted },
-    Unknown { err: Value, raw: Value },
+    Logout {
+        err: Value,
+        info: Value,
+    },
+    SettlementInfo {
+        err: Value,
+        info: SettlementInfo,
+    },
+    SettlementInfoConfirm {
+        err: Value,
+        info: SettlementInfoConfirm,
+    },
+    TradingAccount {
+        err: Value,
+        info: TradingAccount,
+    },
+    OrderInsertReturnError {
+        err: Value,
+        info: OrderInsertReturnError,
+    },
+    OrderInsertError {
+        err: Value,
+        info: OrderInsertError,
+    },
+    OrderInserted {
+        err: Value,
+        info: OrderInserted,
+    },
+    OrderTraded {
+        err: Value,
+        info: OrderTraded,
+    },
+    QueryOrder {
+        err: Value,
+        info: QueryOrder,
+    },
+    QueryInstrument {
+        err: Value,
+        info: Instrument,
+    },
+    OrderDeleteReturnError {
+        err: Value,
+        info: OrderDeleteReturnError,
+    },
+    OrderDeleteError {
+        err: Value,
+        info: OrderDeleteError,
+    },
+    OrderDeleted {
+        err: Value,
+        info: OrderDeleted,
+    },
+    Unknown {
+        err: Value,
+        raw: Value,
+    },
 }
 
 pub struct TradeClient {
@@ -75,7 +139,11 @@ impl TradeClient {
             .await
     }
 
-    pub async fn set(&mut self, broker_id: Option<String>, investor_id: Option<String>) -> WebCtpResult<()> {
+    pub async fn set(
+        &mut self,
+        broker_id: Option<String>,
+        investor_id: Option<String>,
+    ) -> WebCtpResult<()> {
         if let Some(b) = broker_id.clone() {
             self.broker_id = b;
         }
@@ -93,8 +161,7 @@ impl TradeClient {
     }
 
     pub async fn get_trading_day(&mut self) -> WebCtpResult<()> {
-        self.send_op("get_trading_day", json!({}))
-            .await
+        self.send_op("get_trading_day", json!({})).await
     }
 
     pub async fn auth(&mut self, user_id: &str, app_id: &str, auth_code: &str) -> WebCtpResult<()> {
@@ -111,8 +178,7 @@ impl TradeClient {
     }
 
     pub async fn logout(&mut self, user_id: &str) -> WebCtpResult<()> {
-        self.send_op("logout", json!({"user_id": user_id}))
-            .await
+        self.send_op("logout", json!({"user_id": user_id})).await
     }
 
     pub async fn query_settlement_info(&mut self, trading_day: &str) -> WebCtpResult<()> {
@@ -121,13 +187,11 @@ impl TradeClient {
     }
 
     pub async fn confirm_settlement_info(&mut self) -> WebCtpResult<()> {
-        self.send_op("confirm_settlement_info", json!({}))
-            .await
+        self.send_op("confirm_settlement_info", json!({})).await
     }
 
     pub async fn query_trading_account(&mut self) -> WebCtpResult<()> {
-        self.send_op("query_trading_account", json!({}))
-            .await
+        self.send_op("query_trading_account", json!({})).await
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -183,7 +247,13 @@ impl TradeClient {
         self.send_op("query_order", Value::Object(data)).await
     }
 
-    pub async fn delete_order(&mut self, exchange: &str, instrument: &str, delete_ref: i64, order_sys_id: &str) -> WebCtpResult<()> {
+    pub async fn delete_order(
+        &mut self,
+        exchange: &str,
+        instrument: &str,
+        delete_ref: i64,
+        order_sys_id: &str,
+    ) -> WebCtpResult<()> {
         self.send_op(
             "delete_order",
             json!({
@@ -260,9 +330,7 @@ fn parse_trade(env: Envelope) -> WebCtpResult<TradeEvent> {
     match msg {
         Value::String(s) => match s.as_str() {
             "ready" => Ok(TradeEvent::Ready { err, info }),
-            "parse_error" | "processing_error" | "error" => {
-                Ok(TradeEvent::Error { err })
-            }
+            "parse_error" | "processing_error" | "error" => Ok(TradeEvent::Error { err }),
             _ => Ok(TradeEvent::Unknown {
                 err,
                 raw: Value::String(s),

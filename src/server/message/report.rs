@@ -1,12 +1,6 @@
-use serde::{
-    self,
-    Serialize
-};
+use serde::{self, Serialize};
 use serde_json::Value;
-use serde_repr::{
-    self,
-    Serialize_repr
-};
+use serde_repr::{self, Serialize_repr};
 
 #[derive(Serialize_repr)]
 #[repr(i64)]
