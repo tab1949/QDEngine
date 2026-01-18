@@ -13,36 +13,36 @@ use super::{WebCtpError, WebCtpResult};
 
 #[derive(Debug, Clone)]
 pub enum TradeEvent {
-    Ready,
-    Performed(Value),
-    Error(Value),
-    ErrorNull(Value),
-    ErrorUnknownValue(Value),
-    FrontConnected(Value),
+    Ready { err: Value, info: Value },
+    Performed { err: Value, info: Value },
+    Error { err: Value },
+    ErrorNull { err: Value },
+    ErrorUnknownValue { err: Value },
+    FrontConnected { err: Value, info: Value },
     TradingDay {
-        trading_day: Option<String>,
-        raw: Value,
+        err: Value,
+        info: Value,
     },
-    FrontDisconnected(Value),
-    Authenticate(Value),
+    FrontDisconnected { err: Value, info: Value },
+    Authenticate { err: Value, info: Value },
     Login {
-        trading_day: Option<String>,
-        raw: Value,
+        err: Value,
+        info: Value,
     },
-    Logout(Value),
-    SettlementInfo(SettlementInfo),
-    SettlementInfoConfirm(SettlementInfoConfirm),
-    TradingAccount(TradingAccount),
-    OrderInsertReturnError(OrderInsertReturnError),
-    OrderInsertError(OrderInsertError),
-    OrderInserted(OrderInserted),
-    OrderTraded(OrderTraded),
-    QueryOrder(QueryOrder),
-    QueryInstrument(Instrument),
-    OrderDeleteReturnError(OrderDeleteReturnError),
-    OrderDeleteError(OrderDeleteError),
-    OrderDeleted(OrderDeleted),
-    Unknown(Value),
+    Logout { err: Value, info: Value },
+    SettlementInfo { err: Value, info: SettlementInfo },
+    SettlementInfoConfirm { err: Value, info: SettlementInfoConfirm },
+    TradingAccount { err: Value, info: TradingAccount },
+    OrderInsertReturnError { err: Value, info: OrderInsertReturnError },
+    OrderInsertError { err: Value, info: OrderInsertError },
+    OrderInserted { err: Value, info: OrderInserted },
+    OrderTraded { err: Value, info: OrderTraded },
+    QueryOrder { err: Value, info: QueryOrder },
+    QueryInstrument { err: Value, info: Instrument },
+    OrderDeleteReturnError { err: Value, info: OrderDeleteReturnError },
+    OrderDeleteError { err: Value, info: OrderDeleteError },
+    OrderDeleted { err: Value, info: OrderDeleted },
+    Unknown { err: Value, raw: Value },
 }
 
 pub struct TradeClient {
@@ -242,7 +242,10 @@ impl TradeClient {
                     let env: Envelope = serde_json::from_str(text)?;
                     Ok(Some(parse_trade(env)?))
                 } else {
-                    Ok(Some(TradeEvent::Unknown(json!({"binary": true}))))
+                    Ok(Some(TradeEvent::Unknown {
+                        err: json!({"reason": "binary_message"}),
+                        raw: json!({"binary": true}),
+                    }))
                 }
             }
             Some(Err(e)) => Err(WebCtpError::WebSocket(e)),
@@ -252,94 +255,88 @@ impl TradeClient {
 }
 
 fn parse_trade(env: Envelope) -> WebCtpResult<TradeEvent> {
-    match env.msg {
+    let Envelope { msg, err, info } = env;
+
+    match msg {
         Value::String(s) => match s.as_str() {
-            "ready" => Ok(TradeEvent::Ready),
+            "ready" => Ok(TradeEvent::Ready { err, info }),
             "parse_error" | "processing_error" | "error" => {
-                Ok(TradeEvent::Error(env.info.clone()))
+                Ok(TradeEvent::Error { err })
             }
-            _ => Ok(TradeEvent::Unknown(Value::String(s))),
+            _ => Ok(TradeEvent::Unknown {
+                err,
+                raw: Value::String(s),
+            }),
         },
         Value::Number(num) => {
             let code: i64 = num
                 .as_i64()
                 .ok_or_else(|| WebCtpError::Protocol("non-integer msg code".into()))?;
-            let info = env.info;
             match TradeMsgCode::try_from(code) {
-                Ok(TradeMsgCode::Performed) => Ok(TradeEvent::Performed(info)),
-                Ok(TradeMsgCode::Error) => Ok(TradeEvent::Error(info.clone())),
-                Ok(TradeMsgCode::ErrorNull) => Ok(TradeEvent::ErrorNull(info.clone())),
-                Ok(TradeMsgCode::ErrorUnknownValue) => Ok(TradeEvent::ErrorUnknownValue(info.clone())),
-                Ok(TradeMsgCode::Connected) => Ok(TradeEvent::FrontConnected(info)),
-                Ok(TradeMsgCode::TradingDay) => Ok(TradeEvent::TradingDay {
-                    trading_day: parse_trading_day(&info),
-                    raw: info,
-                }),
-                Ok(TradeMsgCode::Disconnected) => Ok(TradeEvent::FrontDisconnected(info)),
-                Ok(TradeMsgCode::Authenticate) => Ok(TradeEvent::Authenticate(info)),
-                Ok(TradeMsgCode::Login) => Ok(TradeEvent::Login {
-                    trading_day: parse_trading_day(&info),
-                    raw: info,
-                }),
-                Ok(TradeMsgCode::Logout) => Ok(TradeEvent::Logout(info)),
+                Ok(TradeMsgCode::Performed) => Ok(TradeEvent::Performed { err, info }),
+                Ok(TradeMsgCode::Error) => Ok(TradeEvent::Error { err }),
+                Ok(TradeMsgCode::ErrorNull) => Ok(TradeEvent::ErrorNull { err }),
+                Ok(TradeMsgCode::ErrorUnknownValue) => Ok(TradeEvent::ErrorUnknownValue { err }),
+                Ok(TradeMsgCode::Connected) => Ok(TradeEvent::FrontConnected { err, info }),
+                Ok(TradeMsgCode::TradingDay) => Ok(TradeEvent::TradingDay { err, info }),
+                Ok(TradeMsgCode::Disconnected) => Ok(TradeEvent::FrontDisconnected { err, info }),
+                Ok(TradeMsgCode::Authenticate) => Ok(TradeEvent::Authenticate { err, info }),
+                Ok(TradeMsgCode::Login) => Ok(TradeEvent::Login { err, info }),
+                Ok(TradeMsgCode::Logout) => Ok(TradeEvent::Logout { err, info }),
                 Ok(TradeMsgCode::SettlementInfo) => {
-                    let data: SettlementInfo = serde_json::from_value(info)?;
-                    Ok(TradeEvent::SettlementInfo(data))
+                    let info: SettlementInfo = serde_json::from_value(info)?;
+                    Ok(TradeEvent::SettlementInfo { err, info })
                 }
                 Ok(TradeMsgCode::SettlementInfoConfirm) => {
-                    let data: SettlementInfoConfirm = serde_json::from_value(info)?;
-                    Ok(TradeEvent::SettlementInfoConfirm(data))
+                    let info: SettlementInfoConfirm = serde_json::from_value(info)?;
+                    Ok(TradeEvent::SettlementInfoConfirm { err, info })
                 }
                 Ok(TradeMsgCode::TradingAccount) => {
-                    let data: TradingAccount = serde_json::from_value(info)?;
-                    Ok(TradeEvent::TradingAccount(data))
+                    let info: TradingAccount = serde_json::from_value(info)?;
+                    Ok(TradeEvent::TradingAccount { err, info })
                 }
                 Ok(TradeMsgCode::OrderInsertError) => {
-                    let data: OrderInsertError = serde_json::from_value(info)?;
-                    Ok(TradeEvent::OrderInsertError(data))
+                    let info: OrderInsertError = serde_json::from_value(info)?;
+                    Ok(TradeEvent::OrderInsertError { err, info })
                 }
                 Ok(TradeMsgCode::OrderInsertReturnError) => {
-                    let data: OrderInsertReturnError = serde_json::from_value(info.clone())?;
-                    Ok(TradeEvent::OrderInsertReturnError(data))
+                    let info: OrderInsertReturnError = serde_json::from_value(info.clone())?;
+                    Ok(TradeEvent::OrderInsertReturnError { err, info })
                 }
                 Ok(TradeMsgCode::OrderInserted) => {
-                    let data: OrderInserted = serde_json::from_value(info.clone())?;
-                    Ok(TradeEvent::OrderInserted(data))
+                    let info: OrderInserted = serde_json::from_value(info.clone())?;
+                    Ok(TradeEvent::OrderInserted { err, info })
                 }
                 Ok(TradeMsgCode::OrderTraded) => {
-                    let data: OrderTraded = serde_json::from_value(info.clone())?;
-                    Ok(TradeEvent::OrderTraded(data))
+                    let info: OrderTraded = serde_json::from_value(info.clone())?;
+                    Ok(TradeEvent::OrderTraded { err, info })
                 }
                 Ok(TradeMsgCode::QueryOrder) => {
-                    let data: QueryOrder = serde_json::from_value(info.clone())?;
-                    Ok(TradeEvent::QueryOrder(data))
+                    let info: QueryOrder = serde_json::from_value(info.clone())?;
+                    Ok(TradeEvent::QueryOrder { err, info })
                 }
                 Ok(TradeMsgCode::OrderDeleteError) => {
-                    let data: OrderDeleteError = serde_json::from_value(info.clone())?;
-                    Ok(TradeEvent::OrderDeleteError(data))
+                    let info: OrderDeleteError = serde_json::from_value(info.clone())?;
+                    Ok(TradeEvent::OrderDeleteError { err, info })
                 }
                 Ok(TradeMsgCode::OrderDeleteReturnError) => {
-                    let data: OrderDeleteReturnError = serde_json::from_value(info.clone())?;
-                    Ok(TradeEvent::OrderDeleteReturnError(data))
+                    let info: OrderDeleteReturnError = serde_json::from_value(info.clone())?;
+                    Ok(TradeEvent::OrderDeleteReturnError { err, info })
                 }
                 Ok(TradeMsgCode::OrderDeleted) => {
-                    let data: OrderDeleted = serde_json::from_value(info.clone())?;
-                    Ok(TradeEvent::OrderDeleted(data))
+                    let info: OrderDeleted = serde_json::from_value(info.clone())?;
+                    Ok(TradeEvent::OrderDeleted { err, info })
                 }
                 Ok(TradeMsgCode::QueryInstrument) => {
-                    let data: Instrument = serde_json::from_value(info)?;
-                    Ok(TradeEvent::QueryInstrument(data))
+                    let info: Instrument = serde_json::from_value(info)?;
+                    Ok(TradeEvent::QueryInstrument { err, info })
                 }
-                Err(_) => Ok(TradeEvent::Unknown(json!({"msg_code": code}))),
+                Err(_) => Ok(TradeEvent::Unknown {
+                    err,
+                    raw: json!({"msg_code": code}),
+                }),
             }
         }
-        other => Ok(TradeEvent::Unknown(other)),
-    }
-}
-
-fn parse_trading_day(info: &Value) -> Option<String> {
-    match info.get("trading_day") {
-        Some(Value::String(s)) => Some(s.clone()),
-        _ => None,
+        other => Ok(TradeEvent::Unknown { err, raw: other }),
     }
 }

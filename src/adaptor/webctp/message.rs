@@ -98,7 +98,7 @@ impl TryFrom<i64> for TradeMsgCode {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub struct MarketData {
     pub trading_day: String,
@@ -149,7 +149,7 @@ pub struct MarketData {
     pub banding_lower_price: f64,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 #[serde(default)]
 pub struct TradingAccount {
@@ -205,7 +205,7 @@ pub struct TradingAccount {
     pub is_last: bool,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 #[serde(default)]
 pub struct SettlementInfo {
@@ -221,7 +221,7 @@ pub struct SettlementInfo {
     pub is_last: bool,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 #[serde(default)]
 pub struct SettlementInfoConfirm {
@@ -236,7 +236,7 @@ pub struct SettlementInfoConfirm {
     pub is_last: bool,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 #[serde(default)]
 pub struct OrderInserted {
@@ -244,6 +244,7 @@ pub struct OrderInserted {
     pub investor_id: Option<String>,
     pub user_id: Option<String>,
     pub exchange_id: Option<String>,
+    pub req_id: Option<i64>,
     pub r#ref: Option<String>,
     pub order_local_id: Option<String>,
     pub order_sys_id: Option<String>,
@@ -267,7 +268,7 @@ pub struct OrderInserted {
     pub time_condition: Option<i64>,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 #[serde(default)]
 pub struct OrderTraded {
@@ -287,7 +288,7 @@ pub struct OrderTraded {
     pub hedge: Option<i64>,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 #[serde(default)]
 pub struct QueryOrder {
@@ -322,7 +323,7 @@ pub struct QueryOrder {
     pub is_last: bool,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 #[serde(default)]
 pub struct OrderInsertError {
@@ -354,7 +355,7 @@ pub struct OrderInsertError {
     pub is_last: Option<bool>,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 #[serde(default)]
 pub struct OrderInsertReturnError {
@@ -384,7 +385,7 @@ pub struct OrderInsertReturnError {
     pub time_condition: Option<i64>,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 #[serde(default)]
 pub struct OrderDeleteError {
@@ -411,7 +412,7 @@ pub struct OrderDeleteError {
     pub is_last: Option<bool>,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 #[serde(default)]
 pub struct OrderDeleteReturnError {
@@ -448,7 +449,7 @@ pub struct OrderDeleteReturnError {
     pub session_req_seq: Option<i64>,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 #[serde(default)]
 pub struct OrderDeleted {
@@ -456,6 +457,7 @@ pub struct OrderDeleted {
     pub investor_id: Option<String>,
     pub user_id: Option<String>,
     pub exchange_id: Option<String>,
+    pub req_id: Option<i64>,
     pub r#ref: Option<String>,
     pub order_local_id: Option<String>,
     pub order_sys_id: Option<String>,
@@ -479,7 +481,7 @@ pub struct OrderDeleted {
     pub time_condition: Option<i64>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub struct Instrument {
     pub req_id: i64,
@@ -520,5 +522,6 @@ pub struct Instrument {
 #[derive(Debug, Clone, Deserialize)]
 pub struct Envelope {
     pub msg: Value,
+    pub err: Value,
     pub info: Value,
 }

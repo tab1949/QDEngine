@@ -9,25 +9,25 @@ use super::{WebCtpError, WebCtpResult};
 
 #[derive(Debug, Clone)]
 pub enum MarketDataEvent {
-    Ready,
-    Performed(Value),
-    Error(Value),
-    FrontConnected(Value),
-    FrontDisconnected(Value),
-    HeartbeatTimeout(Value),
+    Ready { err: Value, info: Value },
+    Performed { err: Value, info: Value },
+    Error { err: Value },
+    FrontConnected { err: Value, info: Value },
+    FrontDisconnected { err: Value, info: Value },
+    HeartbeatTimeout { err: Value, info: Value },
     Login {
-        trading_day: Option<String>,
-        raw: Value,
+        err: Value,
+        info: Value,
     },
-    Logout(Value),
+    Logout { err: Value, info: Value },
     TradingDay {
-        trading_day: Option<String>,
-        raw: Value,
+        err: Value,
+        info: Value,
     },
-    Subscribe(Value),
-    Unsubscribe(Value),
-    MarketData(MarketData),
-    Unknown(Value),
+    Subscribe { err: Value, info: Value },
+    Unsubscribe { err: Value, info: Value },
+    MarketData { err: Value, info: MarketData },
+    Unknown { err: Value, raw: Value },
 }
 
 pub struct MarketDataClient {
@@ -116,50 +116,44 @@ impl MarketDataClient {
 }
 
 fn parse_market_data(env: Envelope) -> WebCtpResult<MarketDataEvent> {
-    match env.msg {
+    let Envelope { msg, err, info } = env;
+
+    match msg {
         Value::String(s) => match s.as_str() {
-            "ready" => Ok(MarketDataEvent::Ready),
+            "ready" => Ok(MarketDataEvent::Ready { err, info }),
             "parse_error" | "processing_error" | "error" => {
-                Ok(MarketDataEvent::Error(env.info.clone()))
+                Ok(MarketDataEvent::Error { err })
             }
-            _ => Ok(MarketDataEvent::Unknown(Value::String(s))),
+            _ => Ok(MarketDataEvent::Unknown {
+                err,
+                raw: Value::String(s),
+            }),
         },
         Value::Number(num) => {
             let code: i64 = num
                 .as_i64()
                 .ok_or_else(|| WebCtpError::Protocol("non-integer msg code".into()))?;
-            let info = env.info;
             match MdMsgCode::try_from(code) {
-                Ok(MdMsgCode::Performed) => Ok(MarketDataEvent::Performed(info)),
-                Ok(MdMsgCode::Error) => Ok(MarketDataEvent::Error(info)),
-                Ok(MdMsgCode::Connected) => Ok(MarketDataEvent::FrontConnected(info)),
-                Ok(MdMsgCode::Disconnected) => Ok(MarketDataEvent::FrontDisconnected(info)),
-                Ok(MdMsgCode::HeartbeatTimeout) => Ok(MarketDataEvent::HeartbeatTimeout(info)),
-                Ok(MdMsgCode::Login) => Ok(MarketDataEvent::Login {
-                    trading_day: parse_trading_day(&info),
-                    raw: info,
-                }),
-                Ok(MdMsgCode::Logout) => Ok(MarketDataEvent::Logout(info)),
-                Ok(MdMsgCode::TradingDay) => Ok(MarketDataEvent::TradingDay {
-                    trading_day: parse_trading_day(&info),
-                    raw: info,
-                }),
-                Ok(MdMsgCode::Subscribe) => Ok(MarketDataEvent::Subscribe(info)),
-                Ok(MdMsgCode::Unsubscribe) => Ok(MarketDataEvent::Unsubscribe(info)),
+                Ok(MdMsgCode::Performed) => Ok(MarketDataEvent::Performed { err, info }),
+                Ok(MdMsgCode::Error) => Ok(MarketDataEvent::Error { err }),
+                Ok(MdMsgCode::Connected) => Ok(MarketDataEvent::FrontConnected { err, info }),
+                Ok(MdMsgCode::Disconnected) => Ok(MarketDataEvent::FrontDisconnected { err, info }),
+                Ok(MdMsgCode::HeartbeatTimeout) => Ok(MarketDataEvent::HeartbeatTimeout { err, info }),
+                Ok(MdMsgCode::Login) => Ok(MarketDataEvent::Login { err, info }),
+                Ok(MdMsgCode::Logout) => Ok(MarketDataEvent::Logout { err, info }),
+                Ok(MdMsgCode::TradingDay) => Ok(MarketDataEvent::TradingDay { err, info }),
+                Ok(MdMsgCode::Subscribe) => Ok(MarketDataEvent::Subscribe { err, info }),
+                Ok(MdMsgCode::Unsubscribe) => Ok(MarketDataEvent::Unsubscribe { err, info }),
                 Ok(MdMsgCode::MarketData) => {
-                    let data: MarketData = serde_json::from_value(info)?;
-                    Ok(MarketDataEvent::MarketData(data))
+                    let info: MarketData = serde_json::from_value(info)?;
+                    Ok(MarketDataEvent::MarketData { err, info })
                 }
-                Err(_) => Ok(MarketDataEvent::Unknown(json!({"msg_code": code}))),
+                Err(_) => Ok(MarketDataEvent::Unknown {
+                    err,
+                    raw: json!({"msg_code": code}),
+                }),
             }
         }
-        other => Ok(MarketDataEvent::Unknown(other)),
-    }
-}
-
-fn parse_trading_day(info: &Value) -> Option<String> {
-    match info.get("trading_day") {
-        Some(Value::String(s)) => Some(s.clone()),
-        _ => None,
+        other => Ok(MarketDataEvent::Unknown { err, raw: other }),
     }
 }
