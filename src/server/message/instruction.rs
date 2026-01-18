@@ -4,12 +4,12 @@ use serde::{
     Deserialize, 
 };
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct HandshakeInstruction {
     pub token: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, Copy)]
 enum MarketType {
     Futures, 
     FuturesOptions, 
@@ -18,25 +18,25 @@ enum MarketType {
     StockUS
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct TestRequestInstruction {
     market:     MarketType,
     time_begin: String,
     time_end:   String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct TestCancelInstruction {
     reference: u64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct TestQueryInstruction {
     reference: u64,
 }
 
 // WebCTP market data instructions
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpMarketDataConnectInstruction {
     pub addr: String,
     pub port: u16,
@@ -44,35 +44,35 @@ pub struct WebCtpMarketDataConnectInstruction {
     pub user_id: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpMarketDataConnectFrontInstruction {
     pub addr: String,
     pub port: u16,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpMarketDataLoginInstruction {
     pub password: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpMarketDataSubscribeInstruction {
     pub instruments: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpMarketDataUnsubscribeInstruction {
     pub instruments: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpMarketDataTradingDayInstruction {}
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpMarketDataDisconnectInstruction {}
 
 // WebCTP trade instructions
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeConnectInstruction {
     pub addr: String,
     pub port: u16,
@@ -80,51 +80,51 @@ pub struct WebCtpTradeConnectInstruction {
     pub investor_id: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeConnectFrontInstruction {
     pub addr: String,
     pub port: u16,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeSetInstruction {
     pub broker_id: Option<String>,
     pub investor_id: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeTradingDayInstruction {}
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeAuthInstruction {
     pub user_id: String,
     pub app_id: String,
     pub auth_code: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeLoginInstruction {
     pub user_id: String,
     pub password: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeLogoutInstruction {
     pub user_id: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeQuerySettlementInfoInstruction {
     pub trading_day: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeConfirmSettlementInfoInstruction {}
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeQueryTradingAccountInstruction {}
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeInsertOrderInstruction {
     pub instrument: String,
     pub exchange: String,
@@ -137,7 +137,7 @@ pub struct WebCtpTradeInsertOrderInstruction {
     pub time_condition: i64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeQueryOrderInstruction {
     pub order_sys_id: Option<String>,
     pub exchange_id: Option<String>,
@@ -145,7 +145,7 @@ pub struct WebCtpTradeQueryOrderInstruction {
     pub to: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeDeleteOrderInstruction {
     pub exchange: String,
     pub instrument: String,
@@ -153,7 +153,7 @@ pub struct WebCtpTradeDeleteOrderInstruction {
     pub order_sys_id: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeQueryInstrumentInstruction {
     pub exchange: Option<String>,
     pub instrument: Option<String>,
@@ -161,5 +161,5 @@ pub struct WebCtpTradeQueryInstrumentInstruction {
     pub product_id: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WebCtpTradeDisconnectInstruction {}
