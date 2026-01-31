@@ -124,9 +124,8 @@ impl TradeClient {
         }
     }
 
-    pub async fn connect(&mut self, addr: &str, port: u16) -> WebCtpResult<()> {
-        let url = format!("ws://{}:{}/trade", addr, port);
-        let client = ClientBuilder::new(&url)
+    pub async fn connect(&mut self, url: &str) -> WebCtpResult<()> {
+        let client = ClientBuilder::new(url)
             .map_err(|e| WebCtpError::Protocol(e.to_string()))?
             .async_connect()
             .await?;

@@ -83,7 +83,7 @@ pub async fn serve(c: &mut Client) {
                                     instructions::handle_instruction(&instruction, c).await;
                                 },
                                 Err(e) => {
-                                    error!("Failed to parse instruction: {:?}", e);
+                                    error!("Failed to parse instruction: {} {:?}", msg.as_str(), e);
                                     c
                                         .send_report(
                                             message::report::ReportCode::GeneralError,

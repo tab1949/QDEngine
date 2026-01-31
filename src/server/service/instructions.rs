@@ -1,4 +1,5 @@
 use tokio::sync::{mpsc, oneshot};
+use tracing::{info, warn};
 
 use crate::adaptor::webctp;
 use crate::server::{message, service};
@@ -492,10 +493,12 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
         message::Instruction::TestCancel(_) => {}
         message::Instruction::TestQuery(_) => {}
         message::Instruction::WebCtpMarketDataConnect(instr) => {
+            info!("Client attempt to connect WebCTP market data: {}", instr.url);
             let mut md =
                 webctp::MarketDataClient::new(instr.broker_id.clone(), instr.user_id.clone());
-            match md.connect(&instr.addr, instr.port).await {
+            match md.connect(&instr.url).await {
                 Ok(_) => {
+                    info!("Client connected WebCTP market data: {}", instr.url);
                     let handle = spawn_market_data_listener(md, client.outbound_tx.clone());
                     client.market_data = Some(handle);
                     client
@@ -507,11 +510,13 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                         .await;
                 }
                 Err(e) => {
+                    warn!("Client failed to connect WebCTP market data: {}: {:?}", instr.url, e);
                     send_webctp_error(client, "failed to connect webctp market data", e).await;
                 }
             }
         }
         message::Instruction::WebCtpMarketDataConnectFront(instr) => {
+            info!("Client attempt to connect CTP market data front: {}:{}", instr.addr, instr.port);
             if let Some(handle) = client.market_data.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
@@ -757,10 +762,12 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
             }
         }
         message::Instruction::WebCtpTradeConnect(instr) => {
+            info!("Client attempt to connect WebCTP trade: {}", instr.url);
             let mut trade =
                 webctp::TradeClient::new(instr.broker_id.clone(), instr.investor_id.clone());
-            match trade.connect(&instr.addr, instr.port).await {
+            match trade.connect(&instr.url).await {
                 Ok(_) => {
+                    info!("Client connected WebCTP trade: {}", instr.url);
                     let handle = spawn_trade_listener(trade, client.outbound_tx.clone());
                     client.trade = Some(handle);
                     client
@@ -772,11 +779,13 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                         .await;
                 }
                 Err(e) => {
+                    warn!("Client failed to connect WebCTP trade: {}: {:?}", instr.url, e);
                     send_webctp_error(client, "failed to connect webctp trade", e).await;
                 }
             }
         }
         message::Instruction::WebCtpTradeConnectFront(instr) => {
+            info!("Client attempt to connect CTP trade front: {}:{}", instr.addr, instr.port);
             if let Some(handle) = client.trade.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle

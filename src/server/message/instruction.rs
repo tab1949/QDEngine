@@ -36,8 +36,7 @@ pub struct TestQueryInstruction {
 // WebCTP market data instructions
 #[derive(Deserialize, Clone)]
 pub struct WebCtpMarketDataConnectInstruction {
-    pub addr: String,
-    pub port: u16,
+    pub url: String,
     pub broker_id: String,
     pub user_id: String,
 }
@@ -72,8 +71,7 @@ pub struct WebCtpMarketDataDisconnectInstruction {}
 // WebCTP trade instructions
 #[derive(Deserialize, Clone)]
 pub struct WebCtpTradeConnectInstruction {
-    pub addr: String,
-    pub port: u16,
+    pub url: String,
     pub broker_id: String,
     pub investor_id: String,
 }
