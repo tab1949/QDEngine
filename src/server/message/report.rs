@@ -42,3 +42,9 @@ pub struct WebCtpEventReport {
     pub event: String,
     pub payload: Value,
 }
+
+#[derive(Serialize)]
+pub struct ErrorReport {
+    pub r#type: String,
+    pub info: String,
+}

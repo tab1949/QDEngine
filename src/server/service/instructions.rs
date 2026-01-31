@@ -32,11 +32,11 @@ enum MarketDataCmd {
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     TradingDay {
-        instr: message::instruction::WebCtpMarketDataTradingDayInstruction,
+        // instr: message::instruction::WebCtpMarketDataTradingDayInstruction,
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     Disconnect {
-        instr: message::instruction::WebCtpMarketDataDisconnectInstruction,
+        // instr: message::instruction::WebCtpMarketDataDisconnectInstruction,
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
 }
@@ -51,7 +51,7 @@ enum TradeCmd {
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     TradingDay {
-        instr: message::instruction::WebCtpTradeTradingDayInstruction,
+        // instr: message::instruction::WebCtpTradeTradingDayInstruction,
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     Auth {
@@ -71,11 +71,11 @@ enum TradeCmd {
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     ConfirmSettlementInfo {
-        instr: message::instruction::WebCtpTradeConfirmSettlementInfoInstruction,
+        // instr: message::instruction::WebCtpTradeConfirmSettlementInfoInstruction,
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     QueryTradingAccount {
-        instr: message::instruction::WebCtpTradeQueryTradingAccountInstruction,
+        // instr: message::instruction::WebCtpTradeQueryTradingAccountInstruction,
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     InsertOrder {
@@ -95,17 +95,26 @@ enum TradeCmd {
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     Disconnect {
-        instr: message::instruction::WebCtpTradeDisconnectInstruction,
+        // instr: message::instruction::WebCtpTradeDisconnectInstruction,
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
 }
 
 async fn send_webctp_error(client: &mut service::Client, title: &str, err: webctp::WebCtpError) {
+    let (err_type, err_info) = match &err {
+        webctp::WebCtpError::NotConnected => ("NotConnected", "WebCtp Server Not Connected".to_string()),
+        webctp::WebCtpError::WebSocket(e) => ("WebSocket", e.to_string()),
+        webctp::WebCtpError::Json(e) => ("Json", e.to_string()),
+        webctp::WebCtpError::Protocol(e) => ("Protocol", e.clone()),
+    };
     client
         .send_report(
             message::report::ReportCode::GeneralError,
             title,
-            format!("{:?}", err),
+            message::report::ErrorReport {
+                r#type: err_type.to_string(),
+                info: err_info
+            },
         )
         .await;
 }
@@ -684,13 +693,13 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpMarketDataTradingDay(instr) => {
+        message::Instruction::WebCtpMarketDataTradingDay() => {
             if let Some(handle) = client.market_data.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
                     .cmd_tx
                     .send(MarketDataCmd::TradingDay {
-                        instr: instr.clone(),
+                        // instr: instr.clone(),
                         resp: resp_tx,
                     })
                     .is_err()
@@ -726,11 +735,11 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpMarketDataDisconnect(instr) => {
+        message::Instruction::WebCtpMarketDataDisconnect() => {
             if let Some(handle) = client.market_data.take() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 let _ = handle.cmd_tx.send(MarketDataCmd::Disconnect {
-                    instr: instr.clone(),
+                    // instr: instr.clone(),
                     resp: resp_tx,
                 });
 
@@ -869,13 +878,13 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpTradeTradingDay(instr) => {
+        message::Instruction::WebCtpTradeTradingDay() => {
             if let Some(handle) = client.trade.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
                     .cmd_tx
                     .send(TradeCmd::TradingDay {
-                        instr: instr.clone(),
+                        // instr: instr.clone(),
                         resp: resp_tx,
                     })
                     .is_err()
@@ -1079,13 +1088,13 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpTradeConfirmSettlementInfo(instr) => {
+        message::Instruction::WebCtpTradeConfirmSettlementInfo() => {
             if let Some(handle) = client.trade.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
                     .cmd_tx
                     .send(TradeCmd::ConfirmSettlementInfo {
-                        instr: instr.clone(),
+                        // instr: instr.clone(),
                         resp: resp_tx,
                     })
                     .is_err()
@@ -1121,13 +1130,13 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpTradeQueryTradingAccount(instr) => {
+        message::Instruction::WebCtpTradeQueryTradingAccount() => {
             if let Some(handle) = client.trade.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
                     .cmd_tx
                     .send(TradeCmd::QueryTradingAccount {
-                        instr: instr.clone(),
+                        // instr: instr.clone(),
                         resp: resp_tx,
                     })
                     .is_err()
@@ -1331,11 +1340,11 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpTradeDisconnect(instr) => {
+        message::Instruction::WebCtpTradeDisconnect() => {
             if let Some(handle) = client.trade.take() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 let _ = handle.cmd_tx.send(TradeCmd::Disconnect {
-                    instr: instr.clone(),
+                    // instr: instr.clone(),
                     resp: resp_tx,
                 });
 

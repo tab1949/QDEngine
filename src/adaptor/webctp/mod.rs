@@ -5,7 +5,7 @@ pub mod trade;
 use websocket_lite::Error as WsError;
 
 pub use market_data::{MarketDataClient, MarketDataEvent};
-pub use message::{MdMsgCode, TradeMsgCode};
+// pub use message::{MdMsgCode, TradeMsgCode};
 pub use trade::{TradeClient, TradeEvent};
 
 pub type WebCtpResult<T> = Result<T, WebCtpError>;
