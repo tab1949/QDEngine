@@ -63,11 +63,11 @@ pub struct WebCtpMarketDataUnsubscribeInstruction {
     pub instruments: Vec<String>,
 }
 
-// #[derive(Deserialize, Clone)]
-// pub struct WebCtpMarketDataTradingDayInstruction {}
+#[derive(Deserialize, Clone)]
+pub struct WebCtpMarketDataTradingDayInstruction {}
 
-// #[derive(Deserialize, Clone)]
-// pub struct WebCtpMarketDataDisconnectInstruction {}
+#[derive(Deserialize, Clone)]
+pub struct WebCtpMarketDataDisconnectInstruction {}
 
 // WebCTP trade instructions
 #[derive(Deserialize, Clone)]
@@ -89,8 +89,8 @@ pub struct WebCtpTradeSetInstruction {
     pub investor_id: Option<String>,
 }
 
-// #[derive(Deserialize, Clone)]
-// pub struct WebCtpTradeTradingDayInstruction {}
+#[derive(Deserialize, Clone)]
+pub struct WebCtpTradeTradingDayInstruction {}
 
 #[derive(Deserialize, Clone)]
 pub struct WebCtpTradeAuthInstruction {
@@ -115,11 +115,11 @@ pub struct WebCtpTradeQuerySettlementInfoInstruction {
     pub trading_day: String,
 }
 
-// #[derive(Deserialize, Clone)]
-// pub struct WebCtpTradeConfirmSettlementInfoInstruction {}
+#[derive(Deserialize, Clone)]
+pub struct WebCtpTradeConfirmSettlementInfoInstruction {}
 
-// #[derive(Deserialize, Clone)]
-// pub struct WebCtpTradeQueryTradingAccountInstruction {}
+#[derive(Deserialize, Clone)]
+pub struct WebCtpTradeQueryTradingAccountInstruction {}
 
 #[derive(Deserialize, Clone)]
 pub struct WebCtpTradeInsertOrderInstruction {
@@ -158,5 +158,5 @@ pub struct WebCtpTradeQueryInstrumentInstruction {
     pub product_id: Option<String>,
 }
 
-// #[derive(Deserialize, Clone)]
-// pub struct WebCtpTradeDisconnectInstruction {}
+#[derive(Deserialize, Clone)]
+pub struct WebCtpTradeDisconnectInstruction {}

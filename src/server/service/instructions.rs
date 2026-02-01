@@ -754,7 +754,7 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpMarketDataTradingDay() => {
+        message::Instruction::WebCtpMarketDataTradingDay(_) => {
             if let Some(handle) = client.market_data.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
@@ -796,7 +796,7 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpMarketDataDisconnect() => {
+        message::Instruction::WebCtpMarketDataDisconnect(_) => {
             if let Some(handle) = client.market_data.take() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 let _ = handle.cmd_tx.send(MarketDataCmd::Disconnect {
@@ -939,7 +939,7 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpTradeTradingDay() => {
+        message::Instruction::WebCtpTradeTradingDay(_) => {
             if let Some(handle) = client.trade.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
@@ -1149,7 +1149,7 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpTradeConfirmSettlementInfo() => {
+        message::Instruction::WebCtpTradeConfirmSettlementInfo(_) => {
             if let Some(handle) = client.trade.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
@@ -1191,7 +1191,7 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpTradeQueryTradingAccount() => {
+        message::Instruction::WebCtpTradeQueryTradingAccount(_) => {
             if let Some(handle) = client.trade.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
@@ -1401,7 +1401,7 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpTradeDisconnect() => {
+        message::Instruction::WebCtpTradeDisconnect(_) => {
             if let Some(handle) = client.trade.take() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 let _ = handle.cmd_tx.send(TradeCmd::Disconnect {
