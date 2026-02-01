@@ -6,9 +6,11 @@ use tracing::{error, warn};
 use super::message;
 use instructions::{MarketDataHandle, TradeHandle};
 mod instructions;
+mod backtest;
 
 pub struct Client {
     pub ws: WebSocket,
+    pub backtest: backtest::BacktestManager,
     market_data: Option<MarketDataHandle>,
     trade: Option<TradeHandle>,
     outbound_tx: mpsc::UnboundedSender<String>,
@@ -20,6 +22,7 @@ impl Client {
         let (outbound_tx, outbound_rx) = mpsc::unbounded_channel();
         Self {
             ws,
+            backtest: backtest::BacktestManager::new(1024),
             market_data: None,
             trade: None,
             outbound_tx,

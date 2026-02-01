@@ -6,9 +6,9 @@ pub mod report;
 #[serde(tag = "action", content = "data")]
 pub enum Instruction {
     Handshake(instruction::HandshakeInstruction),
-    TestRequest(instruction::TestRequestInstruction),
-    TestCancel(instruction::TestCancelInstruction),
-    TestQuery(instruction::TestQueryInstruction),
+    BacktestRequest(instruction::BacktestRequestInstruction),
+    BacktestCancel(instruction::BacktestCancelInstruction),
+    BacktestQuery(instruction::BacktestQueryInstruction),
     WebCtpMarketDataConnect(instruction::WebCtpMarketDataConnectInstruction),
     WebCtpMarketDataConnectFront(instruction::WebCtpMarketDataConnectFrontInstruction),
     WebCtpMarketDataLogin(instruction::WebCtpMarketDataLoginInstruction),

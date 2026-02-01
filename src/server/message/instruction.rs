@@ -8,7 +8,7 @@ pub struct HandshakeInstruction {
 }
 
 #[derive(Deserialize, Clone, Copy)]
-enum MarketType {
+pub enum MarketType {
     Futures,
     FuturesOptions,
     StockCN,
@@ -17,20 +17,21 @@ enum MarketType {
 }
 
 #[derive(Deserialize, Clone)]
-pub struct TestRequestInstruction {
-    market: MarketType,
-    time_begin: String,
-    time_end: String,
+pub struct BacktestRequestInstruction {
+    pub market: MarketType,
+    pub subject: String,
+    pub time_begin: String,
+    pub time_end: String,
 }
 
 #[derive(Deserialize, Clone)]
-pub struct TestCancelInstruction {
-    reference: u64,
+pub struct BacktestCancelInstruction {
+    pub reference: String,
 }
 
 #[derive(Deserialize, Clone)]
-pub struct TestQueryInstruction {
-    reference: u64,
+pub struct BacktestQueryInstruction {
+    pub reference: String,
 }
 
 // WebCTP market data instructions

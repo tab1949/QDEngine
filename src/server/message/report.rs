@@ -37,7 +37,7 @@ pub struct OperationAck {
 }
 
 #[derive(Serialize)]
-pub struct WebCtpEventReport {
+pub struct WebCtpEventReportData {
     pub source: String,
     pub event: String,
     pub payload: Value,

@@ -320,7 +320,7 @@ fn serialize_market_event(event: webctp::MarketDataEvent) -> Option<String> {
     message::generate_report_string(
         message::report::ReportCode::WebCtpMarketDataEvent,
         "webctp market data event",
-        message::report::WebCtpEventReport {
+        message::report::WebCtpEventReportData {
             source: "market_data".to_string(),
             event: event_name.to_string(),
             payload,
@@ -456,7 +456,7 @@ fn serialize_trade_event(event: webctp::TradeEvent) -> Option<String> {
     message::generate_report_string(
         message::report::ReportCode::WebCtpTradeEvent,
         "webctp trade event",
-        message::report::WebCtpEventReport {
+        message::report::WebCtpEventReportData {
             source: "trade".to_string(),
             event: event_name.to_string(),
             payload,
@@ -498,9 +498,70 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                 )
                 .await;
         }
-        message::Instruction::TestRequest(_) => {}
-        message::Instruction::TestCancel(_) => {}
-        message::Instruction::TestQuery(_) => {}
+        message::Instruction::BacktestRequest(instr) => {
+            let task = match client.backtest.new_task(instr) {
+                Ok(task) => task,
+                Err(e) => {
+                    client
+                        .send_report(
+                            message::report::ReportCode::GeneralError,
+                            "failed to create backtest task",
+                            e,
+                        )
+                        .await;
+                    return;
+                }
+            };
+            client.send_report(
+                message::report::ReportCode::Success,
+                "backtest task created",
+                task,
+            ).await;
+        }
+        message::Instruction::BacktestCancel(instr) => {
+            match client.backtest.cancel_task(&instr.reference) {
+                Ok(task_info) => {
+                    client
+                        .send_report(
+                            message::report::ReportCode::Success,
+                            "backtest task canceled",
+                            task_info,
+                        )
+                        .await;
+                }
+                Err(e) => {
+                    client
+                        .send_report(
+                            message::report::ReportCode::GeneralError,
+                            "failed to cancel backtest task",
+                            e,
+                        )
+                        .await;
+                }
+            }
+        }
+        message::Instruction::BacktestQuery(instr) => {
+            match client.backtest.query_task(&instr.reference) {
+                Ok(task_info) => {
+                    client
+                        .send_report(
+                            message::report::ReportCode::Success,
+                            "backtest query result",
+                            task_info,
+                        )
+                        .await;
+                }
+                Err(e) => {
+                    client
+                        .send_report(
+                            message::report::ReportCode::GeneralError,
+                            "failed to query backtest task",
+                            e,
+                        )
+                        .await;
+                }
+            }
+        }
         message::Instruction::WebCtpMarketDataConnect(instr) => {
             info!("Client attempt to connect WebCTP market data: {}", instr.url);
             let mut md =
