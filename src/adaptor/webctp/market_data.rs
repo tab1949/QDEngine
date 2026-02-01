@@ -5,7 +5,7 @@ use websocket_lite::{AsyncNetworkStream, ClientBuilder, Message as WsMessage};
 type Socket =
     websocket_lite::AsyncClient<Box<dyn AsyncNetworkStream + Sync + Send + Unpin + 'static>>;
 
-use super::message::{Envelope, MarketData, MdMsgCode};
+use super::message::{Envelope, MarketData, MdMsgCode, MdLogin, MdLogout, MdSubscribe, MdUnsubscribe, MdTradingDay};
 use super::{WebCtpError, WebCtpResult};
 
 #[derive(Debug, Clone)]
@@ -16,11 +16,11 @@ pub enum MarketDataEvent {
     FrontConnected { err: Value, info: Value },
     FrontDisconnected { err: Value, info: Value },
     HeartbeatTimeout { err: Value, info: Value },
-    Login { err: Value, info: Value },
-    Logout { err: Value, info: Value },
-    TradingDay { err: Value, info: Value },
-    Subscribe { err: Value, info: Value },
-    Unsubscribe { err: Value, info: Value },
+    Login { err: Value, info: MdLogin },
+    Logout { err: Value, info: MdLogout },
+    TradingDay { err: Value, info: MdTradingDay },
+    Subscribe { err: Value, info: MdSubscribe },
+    Unsubscribe { err: Value, info: MdUnsubscribe },
     MarketData { err: Value, info: MarketData },
     Unknown { err: Value, raw: Value },
 }
@@ -134,11 +134,26 @@ fn parse_market_data(env: Envelope) -> WebCtpResult<MarketDataEvent> {
                 Ok(MdMsgCode::HeartbeatTimeout) => {
                     Ok(MarketDataEvent::HeartbeatTimeout { err, info })
                 }
-                Ok(MdMsgCode::Login) => Ok(MarketDataEvent::Login { err, info }),
-                Ok(MdMsgCode::Logout) => Ok(MarketDataEvent::Logout { err, info }),
-                Ok(MdMsgCode::TradingDay) => Ok(MarketDataEvent::TradingDay { err, info }),
-                Ok(MdMsgCode::Subscribe) => Ok(MarketDataEvent::Subscribe { err, info }),
-                Ok(MdMsgCode::Unsubscribe) => Ok(MarketDataEvent::Unsubscribe { err, info }),
+                Ok(MdMsgCode::Login) => {
+                    let info: MdLogin = serde_json::from_value(info)?;
+                    Ok(MarketDataEvent::Login { err, info })
+                }
+                Ok(MdMsgCode::Logout) => {
+                    let info: MdLogout = serde_json::from_value(info)?;
+                    Ok(MarketDataEvent::Logout { err, info })
+                }
+                Ok(MdMsgCode::TradingDay) => {
+                    let info: MdTradingDay = serde_json::from_value(info)?;
+                    Ok(MarketDataEvent::TradingDay { err, info })
+                }
+                Ok(MdMsgCode::Subscribe) => {
+                    let info: MdSubscribe = serde_json::from_value(info)?;
+                    Ok(MarketDataEvent::Subscribe { err, info })
+                }
+                Ok(MdMsgCode::Unsubscribe) => {
+                    let info: MdUnsubscribe = serde_json::from_value(info)?;
+                    Ok(MarketDataEvent::Unsubscribe { err, info })
+                }
                 Ok(MdMsgCode::MarketData) => {
                     let info: MarketData = serde_json::from_value(info)?;
                     Ok(MarketDataEvent::MarketData { err, info })

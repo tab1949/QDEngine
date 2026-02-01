@@ -8,7 +8,7 @@ type Socket =
 use super::message::{
     Envelope, Instrument, OrderDeleteError, OrderDeleteReturnError, OrderDeleted, OrderInsertError,
     OrderInsertReturnError, OrderInserted, OrderTraded, QueryOrder, SettlementInfo,
-    SettlementInfoConfirm, TradeMsgCode, TradingAccount,
+    SettlementInfoConfirm, TradeMsgCode, TradingAccount, TradeLogin, TradeLogout, TradeAuthenticate, TradeTradingDay,
 };
 use super::{WebCtpError, WebCtpResult};
 
@@ -37,7 +37,7 @@ pub enum TradeEvent {
     },
     TradingDay {
         err: Value,
-        info: Value,
+        info: TradeTradingDay,
     },
     FrontDisconnected {
         err: Value,
@@ -45,15 +45,15 @@ pub enum TradeEvent {
     },
     Authenticate {
         err: Value,
-        info: Value,
+        info: TradeAuthenticate,
     },
     Login {
         err: Value,
-        info: Value,
+        info: TradeLogin,
     },
     Logout {
         err: Value,
-        info: Value,
+        info: TradeLogout,
     },
     SettlementInfo {
         err: Value,
@@ -345,11 +345,23 @@ fn parse_trade(env: Envelope) -> WebCtpResult<TradeEvent> {
                 Ok(TradeMsgCode::ErrorNull) => Ok(TradeEvent::ErrorNull { err }),
                 Ok(TradeMsgCode::ErrorUnknownValue) => Ok(TradeEvent::ErrorUnknownValue { err }),
                 Ok(TradeMsgCode::Connected) => Ok(TradeEvent::FrontConnected { err, info }),
-                Ok(TradeMsgCode::TradingDay) => Ok(TradeEvent::TradingDay { err, info }),
+                Ok(TradeMsgCode::TradingDay) => {
+                    let info: TradeTradingDay = serde_json::from_value(info)?;
+                    Ok(TradeEvent::TradingDay { err, info })
+                }
                 Ok(TradeMsgCode::Disconnected) => Ok(TradeEvent::FrontDisconnected { err, info }),
-                Ok(TradeMsgCode::Authenticate) => Ok(TradeEvent::Authenticate { err, info }),
-                Ok(TradeMsgCode::Login) => Ok(TradeEvent::Login { err, info }),
-                Ok(TradeMsgCode::Logout) => Ok(TradeEvent::Logout { err, info }),
+                Ok(TradeMsgCode::Authenticate) => {
+                    let info: TradeAuthenticate = serde_json::from_value(info)?;
+                    Ok(TradeEvent::Authenticate { err, info })
+                }
+                Ok(TradeMsgCode::Login) => {
+                    let info: TradeLogin = serde_json::from_value(info)?;
+                    Ok(TradeEvent::Login { err, info })
+                }
+                Ok(TradeMsgCode::Logout) => {
+                    let info: TradeLogout = serde_json::from_value(info)?;
+                    Ok(TradeEvent::Logout { err, info })
+                }
                 Ok(TradeMsgCode::SettlementInfo) => {
                     let info: SettlementInfo = serde_json::from_value(info)?;
                     Ok(TradeEvent::SettlementInfo { err, info })

@@ -98,8 +98,74 @@ impl TryFrom<i64> for TradeMsgCode {
     }
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
+#[serde(default)]
+pub struct MdLogin {
+    pub msg: Option<String>,
+    pub code: Option<i64>,
+    pub trading_day: Option<String>,
+    pub login_time: Option<String>,
+    pub broker_id: Option<String>,
+    pub user_id: Option<String>,
+    pub system_name: Option<String>,
+    pub front_id: Option<i64>,
+    pub session_id: Option<i64>,
+    pub max_order_ref: Option<String>,
+    pub shfe_time: Option<String>,
+    pub dce_time: Option<String>,
+    pub czce_time: Option<String>,
+    pub ffex_time: Option<String>,
+    pub ine_time: Option<String>,
+    pub sys_version: Option<String>,
+    pub gfex_time: Option<String>,
+    pub login_dr_identity_id: Option<String>,
+    pub user_dr_identity_id: Option<String>,
+    pub last_login_time: Option<String>,
+    pub reserve_info: Option<String>,
+    pub req_id: i64,
+    pub is_last: bool,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
+#[serde(default)]
+pub struct MdLogout {
+    pub broker_id: Option<String>,
+    pub user_id: Option<String>,
+    pub req_id: i64,
+    pub is_last: bool,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
+#[serde(default)]
+pub struct MdSubscribe {
+    pub instrument_id: Option<String>,
+    pub req_id: i64,
+    pub is_last: bool,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
+#[serde(default)]
+pub struct MdUnsubscribe {
+    pub instrument_id: Option<String>,
+    pub req_id: i64,
+    pub is_last: bool,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
+#[serde(default)]
+pub struct MdTradingDay {
+    pub trading_day: Option<String>,
+    pub req_id: i64,
+    pub is_last: bool,
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 pub struct MarketData {
     pub trading_day: String,
     pub instrument_id: String,
@@ -150,7 +216,7 @@ pub struct MarketData {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 #[serde(default)]
 pub struct TradingAccount {
     pub broker_id: Option<String>,
@@ -206,7 +272,7 @@ pub struct TradingAccount {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 #[serde(default)]
 pub struct SettlementInfo {
     pub trading_day: Option<String>,
@@ -222,7 +288,7 @@ pub struct SettlementInfo {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 #[serde(default)]
 pub struct SettlementInfoConfirm {
     pub broker_id: Option<String>,
@@ -237,7 +303,7 @@ pub struct SettlementInfoConfirm {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 #[serde(default)]
 pub struct OrderInserted {
     pub broker_id: Option<String>,
@@ -269,7 +335,7 @@ pub struct OrderInserted {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 #[serde(default)]
 pub struct OrderTraded {
     pub broker_id: Option<String>,
@@ -289,7 +355,7 @@ pub struct OrderTraded {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 #[serde(default)]
 pub struct QueryOrder {
     pub broker_id: Option<String>,
@@ -324,7 +390,7 @@ pub struct QueryOrder {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 #[serde(default)]
 pub struct OrderInsertError {
     pub account_id: Option<String>,
@@ -356,7 +422,7 @@ pub struct OrderInsertError {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 #[serde(default)]
 pub struct OrderInsertReturnError {
     pub account_id: Option<String>,
@@ -386,7 +452,7 @@ pub struct OrderInsertReturnError {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 #[serde(default)]
 pub struct OrderDeleteError {
     pub broker_id: Option<String>,
@@ -413,7 +479,7 @@ pub struct OrderDeleteError {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 #[serde(default)]
 pub struct OrderDeleteReturnError {
     pub broker_id: Option<String>,
@@ -450,7 +516,7 @@ pub struct OrderDeleteReturnError {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 #[serde(default)]
 pub struct OrderDeleted {
     pub broker_id: Option<String>,
@@ -482,7 +548,7 @@ pub struct OrderDeleted {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
 pub struct Instrument {
     pub req_id: i64,
     pub is_last: bool,
@@ -524,4 +590,63 @@ pub struct Envelope {
     pub msg: Value,
     pub err: Value,
     pub info: Value,
+}
+
+// Trade message structs
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
+#[serde(default)]
+pub struct TradeLogin {
+    pub trading_day: Option<String>,
+    pub login_time: Option<String>,
+    pub broker_id: Option<String>,
+    pub user_id: Option<String>,
+    pub system_name: Option<String>,
+    pub front_id: Option<i64>,
+    pub session_id: Option<i64>,
+    pub max_order_ref: Option<String>,
+    pub shfe_time: Option<String>,
+    pub dce_time: Option<String>,
+    pub czce_time: Option<String>,
+    pub ffex_time: Option<String>,
+    pub ine_time: Option<String>,
+    pub sys_version: Option<String>,
+    pub gfex_time: Option<String>,
+    pub login_dr_identity_id: Option<String>,
+    pub user_dr_identity_id: Option<String>,
+    pub last_login_time: Option<String>,
+    pub req_id: i64,
+    pub is_last: bool,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
+#[serde(default)]
+pub struct TradeLogout {
+    pub broker_id: Option<String>,
+    pub user_id: Option<String>,
+    pub req_id: i64,
+    pub is_last: bool,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
+#[serde(default)]
+pub struct TradeAuthenticate {
+    pub app_id: Option<String>,
+    pub app_type: Option<String>,
+    pub broker_id: Option<String>,
+    pub user_id: Option<String>,
+    pub user_product_info: Option<String>,
+    pub req_id: i64,
+    pub is_last: bool,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[serde(rename_all(serialize = "PascalCase", deserialize = "snake_case"))]
+#[serde(default)]
+pub struct TradeTradingDay {
+    pub trading_day: Option<String>,
+    pub req_id: i64,
+    pub is_last: bool,
 }
