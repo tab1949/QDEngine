@@ -32,7 +32,7 @@ enum MarketDataCmd {
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     TradingDay {
-        // instr: message::instruction::WebCtpMarketDataTradingDayInstruction,
+        instr: message::instruction::WebCtpMarketDataTradingDayInstruction,
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     Disconnect {
@@ -51,7 +51,7 @@ enum TradeCmd {
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     TradingDay {
-        // instr: message::instruction::WebCtpTradeTradingDayInstruction,
+        instr: message::instruction::WebCtpTradeTradingDayInstruction,
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     Auth {
@@ -71,11 +71,11 @@ enum TradeCmd {
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     ConfirmSettlementInfo {
-        // instr: message::instruction::WebCtpTradeConfirmSettlementInfoInstruction,
+        instr: message::instruction::WebCtpTradeConfirmSettlementInfoInstruction,
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     QueryTradingAccount {
-        // instr: message::instruction::WebCtpTradeQueryTradingAccountInstruction,
+        instr: message::instruction::WebCtpTradeQueryTradingAccountInstruction,
         resp: oneshot::Sender<webctp::WebCtpResult<()>>,
     },
     InsertOrder {
@@ -152,19 +152,19 @@ fn spawn_market_data_listener(
                 maybe_cmd = cmd_rx.recv() => {
                     match maybe_cmd {
                         Some(MarketDataCmd::ConnectFront { instr, resp }) => {
-                            let _ = resp.send(md.connect_front(&instr.addr, instr.port).await);
+                            let _ = resp.send(md.connect_front(&instr.op_ref, &instr.addr, instr.port).await);
                         }
                         Some(MarketDataCmd::Login { instr, resp }) => {
-                            let _ = resp.send(md.login(&instr.password).await);
+                            let _ = resp.send(md.login(&instr.op_ref, &instr.password).await);
                         }
                         Some(MarketDataCmd::Subscribe { instr, resp }) => {
-                            let _ = resp.send(md.subscribe(&instr.instruments).await);
+                            let _ = resp.send(md.subscribe(&instr.op_ref, &instr.instruments).await);
                         }
                         Some(MarketDataCmd::Unsubscribe { instr, resp }) => {
-                            let _ = resp.send(md.unsubscribe(&instr.instruments).await);
+                            let _ = resp.send(md.unsubscribe(&instr.op_ref, &instr.instruments).await);
                         }
-                        Some(MarketDataCmd::TradingDay { resp, .. }) => {
-                            let _ = resp.send(md.get_trading_day().await);
+                        Some(MarketDataCmd::TradingDay { instr, resp }) => {
+                            let _ = resp.send(md.get_trading_day(&instr.op_ref).await);
                         }
                         Some(MarketDataCmd::Disconnect { resp, .. }) => {
                             let res = md.disconnect().await;
@@ -214,43 +214,43 @@ fn spawn_trade_listener(
                 maybe_cmd = cmd_rx.recv() => {
                     match maybe_cmd {
                         Some(TradeCmd::ConnectFront { instr, resp }) => {
-                            let _ = resp.send(trade.connect_front(&instr.addr, instr.port).await);
+                            let _ = resp.send(trade.connect_front(&instr.op_ref, &instr.addr, instr.port).await);
                         }
                         Some(TradeCmd::Set { instr, resp }) => {
-                            let _ = resp.send(trade.set(instr.broker_id.clone(), instr.investor_id.clone()).await);
+                            let _ = resp.send(trade.set(&instr.op_ref, instr.broker_id.clone(), instr.investor_id.clone()).await);
                         }
-                        Some(TradeCmd::TradingDay { resp, .. }) => {
-                            let _ = resp.send(trade.get_trading_day().await);
+                        Some(TradeCmd::TradingDay { instr, resp }) => {
+                            let _ = resp.send(trade.get_trading_day(&instr.op_ref).await);
                         }
                         Some(TradeCmd::Auth { instr, resp }) => {
-                            let _ = resp.send(trade.auth(&instr.user_id, &instr.app_id, &instr.auth_code).await);
+                            let _ = resp.send(trade.auth(&instr.op_ref, &instr.user_id, &instr.app_id, &instr.auth_code).await);
                         }
                         Some(TradeCmd::Login { instr, resp }) => {
-                            let _ = resp.send(trade.login(&instr.user_id, &instr.password).await);
+                            let _ = resp.send(trade.login(&instr.op_ref, &instr.user_id, &instr.password).await);
                         }
                         Some(TradeCmd::Logout { instr, resp }) => {
-                            let _ = resp.send(trade.logout(&instr.user_id).await);
+                            let _ = resp.send(trade.logout(&instr.op_ref, &instr.user_id).await);
                         }
                         Some(TradeCmd::QuerySettlementInfo { instr, resp }) => {
-                            let _ = resp.send(trade.query_settlement_info(&instr.trading_day).await);
+                            let _ = resp.send(trade.query_settlement_info(&instr.op_ref, &instr.trading_day).await);
                         }
-                        Some(TradeCmd::ConfirmSettlementInfo { resp, .. }) => {
-                            let _ = resp.send(trade.confirm_settlement_info().await);
+                        Some(TradeCmd::ConfirmSettlementInfo { instr, resp }) => {
+                            let _ = resp.send(trade.confirm_settlement_info(&instr.op_ref).await);
                         }
-                        Some(TradeCmd::QueryTradingAccount { resp, .. }) => {
-                            let _ = resp.send(trade.query_trading_account().await);
+                        Some(TradeCmd::QueryTradingAccount { instr, resp }) => {
+                            let _ = resp.send(trade.query_trading_account(&instr.op_ref).await);
                         }
                         Some(TradeCmd::InsertOrder { instr, resp }) => {
-                            let _ = resp.send(trade.insert_order(&instr.instrument, &instr.exchange, &instr.reference, instr.price, instr.direction, instr.offset, instr.volume, instr.price_type, instr.time_condition).await);
+                            let _ = resp.send(trade.insert_order(&instr.op_ref, &instr.instrument, &instr.exchange, &instr.reference, instr.price, instr.direction, instr.offset, instr.volume, instr.price_type, instr.time_condition).await);
                         }
                         Some(TradeCmd::QueryOrder { instr, resp }) => {
-                            let _ = resp.send(trade.query_order(instr.order_sys_id.clone(), instr.exchange_id.clone(), instr.from.clone(), instr.to.clone()).await);
+                            let _ = resp.send(trade.query_order(&instr.op_ref, instr.order_sys_id.clone(), instr.exchange_id.clone(), instr.from.clone(), instr.to.clone()).await);
                         }
                         Some(TradeCmd::DeleteOrder { instr, resp }) => {
-                            let _ = resp.send(trade.delete_order(&instr.exchange, &instr.instrument, instr.delete_ref, &instr.order_sys_id).await);
+                            let _ = resp.send(trade.delete_order(&instr.op_ref, &instr.exchange, &instr.instrument, instr.delete_ref, &instr.order_sys_id).await);
                         }
                         Some(TradeCmd::QueryInstrument { instr, resp }) => {
-                            let _ = resp.send(trade.query_instrument(instr.exchange.clone(), instr.instrument.clone(), instr.exchange_inst_id.clone(), instr.product_id.clone()).await);
+                            let _ = resp.send(trade.query_instrument(&instr.op_ref, instr.exchange.clone(), instr.instrument.clone(), instr.exchange_inst_id.clone(), instr.product_id.clone()).await);
                         }
                         Some(TradeCmd::Disconnect { resp, .. }) => {
                             let res = trade.disconnect().await;
@@ -340,8 +340,8 @@ fn serialize_trade_event(event: webctp::TradeEvent) -> Option<String> {
         }
         webctp::TradeEvent::Error { err } => ("error", serde_json::json!({ "err": err })),
         webctp::TradeEvent::ErrorNull { err } => ("error_null", serde_json::json!({ "err": err })),
-        webctp::TradeEvent::ErrorUnknownValue { err } => {
-            ("error_unknown_value", serde_json::json!({ "err": err }))
+        webctp::TradeEvent::ErrorUnknownValue { err, info } => {
+            ("error_unknown_value", serde_json::json!({ "err": err, "info": info }))
         }
         webctp::TradeEvent::FrontConnected { err, info } => (
             "front_connected",
@@ -755,13 +755,13 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpMarketDataTradingDay(_) => {
+        message::Instruction::WebCtpMarketDataTradingDay(instr) => {
             if let Some(handle) = client.market_data.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
                     .cmd_tx
                     .send(MarketDataCmd::TradingDay {
-                        // instr: instr.clone(),
+                        instr: instr.clone(),
                         resp: resp_tx,
                     })
                     .is_err()
@@ -940,13 +940,13 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpTradeTradingDay(_) => {
+        message::Instruction::WebCtpTradeTradingDay(instr) => {
             if let Some(handle) = client.trade.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
                     .cmd_tx
                     .send(TradeCmd::TradingDay {
-                        // instr: instr.clone(),
+                        instr: instr.clone(),
                         resp: resp_tx,
                     })
                     .is_err()
@@ -1150,13 +1150,13 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpTradeConfirmSettlementInfo(_) => {
+        message::Instruction::WebCtpTradeConfirmSettlementInfo(instr) => {
             if let Some(handle) = client.trade.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
                     .cmd_tx
                     .send(TradeCmd::ConfirmSettlementInfo {
-                        // instr: instr.clone(),
+                        instr: instr.clone(),
                         resp: resp_tx,
                     })
                     .is_err()
@@ -1192,13 +1192,13 @@ pub async fn handle_instruction(instruction: &message::Instruction, client: &mut
                     .await;
             }
         }
-        message::Instruction::WebCtpTradeQueryTradingAccount(_) => {
+        message::Instruction::WebCtpTradeQueryTradingAccount(instr) => {
             if let Some(handle) = client.trade.as_ref() {
                 let (resp_tx, resp_rx) = oneshot::channel();
                 if handle
                     .cmd_tx
                     .send(TradeCmd::QueryTradingAccount {
-                        // instr: instr.clone(),
+                        instr: instr.clone(),
                         resp: resp_tx,
                     })
                     .is_err()

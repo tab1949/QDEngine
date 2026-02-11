@@ -50,31 +50,61 @@ impl MarketDataClient {
         Ok(())
     }
 
-    pub async fn connect_front(&mut self, addr: &str, port: u16) -> WebCtpResult<()> {
-        self.send_op("connect", json!({"addr": addr, "port": port.to_string()}))
-            .await
-    }
-
-    pub async fn login(&mut self, password: &str) -> WebCtpResult<()> {
+    pub async fn connect_front(&mut self, op_ref: &str, addr: &str, port: u16) -> WebCtpResult<()> {
         self.send_op(
-            "login",
-            json!({"broker_id": self.broker_id, "user_id": self.user_id, "password": password}),
+            "connect",
+            json!({
+                "op_ref": op_ref, 
+                "addr": addr, 
+                "port": port.to_string()
+            }),
         )
         .await
     }
 
-    pub async fn subscribe(&mut self, instruments: &[String]) -> WebCtpResult<()> {
-        self.send_op("subscribe", json!({"instruments": instruments}))
-            .await
+    pub async fn login(&mut self, op_ref: &str, password: &str) -> WebCtpResult<()> {
+        self.send_op(
+            "login",
+            json!({
+                "op_ref": op_ref,
+                "broker_id": self.broker_id, 
+                "user_id": self.user_id, 
+                "password": password
+            }),
+        )
+        .await
     }
 
-    pub async fn unsubscribe(&mut self, instruments: &[String]) -> WebCtpResult<()> {
-        self.send_op("unsubscribe", json!({"instruments": instruments}))
-            .await
+    pub async fn subscribe(&mut self, op_ref: &str, instruments: &[String]) -> WebCtpResult<()> {
+        self.send_op(
+            "subscribe", 
+            json!({
+                "op_ref": op_ref, 
+                "instruments": instruments
+            })
+        )
+        .await
     }
 
-    pub async fn get_trading_day(&mut self) -> WebCtpResult<()> {
-        self.send_op("get_trading_day", json!({})).await
+    pub async fn unsubscribe(&mut self, op_ref: &str, instruments: &[String]) -> WebCtpResult<()> {
+        self.send_op(
+            "unsubscribe", 
+            json!({
+                "op_ref": op_ref, 
+                "instruments": instruments
+            })
+        )
+        .await
+    }
+
+    pub async fn get_trading_day(&mut self, op_ref: &str) -> WebCtpResult<()> {
+        self.send_op(
+            "get_trading_day", 
+            json!({
+                "op_ref": op_ref
+            })
+        )
+        .await
     }
 
     pub async fn disconnect(&mut self) -> WebCtpResult<()> {

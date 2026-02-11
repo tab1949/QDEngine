@@ -30,6 +30,7 @@ pub enum TradeEvent {
     },
     ErrorUnknownValue {
         err: Value,
+        info: Value,
     },
     FrontConnected {
         err: Value,
@@ -133,13 +134,21 @@ impl TradeClient {
         Ok(())
     }
 
-    pub async fn connect_front(&mut self, addr: &str, port: u16) -> WebCtpResult<()> {
-        self.send_op("connect", json!({"addr": addr, "port": port.to_string()}))
-            .await
+    pub async fn connect_front(&mut self, op_ref: &str, addr: &str, port: u16) -> WebCtpResult<()> {
+        self.send_op(
+            "connect", 
+            json!({
+                "op_ref": op_ref, 
+                "addr": addr, 
+                "port": port.to_string()
+            })
+        )
+        .await
     }
 
     pub async fn set(
         &mut self,
+        op_ref: &str,
         broker_id: Option<String>,
         investor_id: Option<String>,
     ) -> WebCtpResult<()> {
@@ -150,6 +159,7 @@ impl TradeClient {
             self.investor_id = i;
         }
         let mut data = serde_json::Map::new();
+        data.insert("op_ref".into(), json!(op_ref));
         if let Some(b) = broker_id {
             data.insert("broker_id".into(), json!(b));
         }
@@ -159,43 +169,87 @@ impl TradeClient {
         self.send_op("set", Value::Object(data)).await
     }
 
-    pub async fn get_trading_day(&mut self) -> WebCtpResult<()> {
-        self.send_op("get_trading_day", json!({})).await
-    }
-
-    pub async fn auth(&mut self, user_id: &str, app_id: &str, auth_code: &str) -> WebCtpResult<()> {
+    pub async fn get_trading_day(&mut self, op_ref: &str) -> WebCtpResult<()> {
         self.send_op(
-            "auth",
-            json!({"user_id": user_id, "app_id": app_id, "auth_code": auth_code}),
+            "get_trading_day", 
+            json!({
+                "op_ref": op_ref
+            })
         )
         .await
     }
 
-    pub async fn login(&mut self, user_id: &str, password: &str) -> WebCtpResult<()> {
-        self.send_op("login", json!({"user_id": user_id, "password": password}))
-            .await
+    pub async fn auth(&mut self, op_ref: &str, user_id: &str, app_id: &str, auth_code: &str) -> WebCtpResult<()> {
+        self.send_op(
+            "auth",
+            json!({
+                "op_ref": op_ref,
+                "user_id": user_id, 
+                "app_id": app_id, 
+                "auth_code": auth_code
+            }),
+        )
+        .await
     }
 
-    pub async fn logout(&mut self, user_id: &str) -> WebCtpResult<()> {
-        self.send_op("logout", json!({"user_id": user_id})).await
+    pub async fn login(&mut self, op_ref: &str, user_id: &str, password: &str) -> WebCtpResult<()> {
+        self.send_op(
+            "login", 
+            json!({
+                "op_ref": op_ref, 
+                "user_id": user_id, 
+                "password": password
+            })
+        )
+        .await
     }
 
-    pub async fn query_settlement_info(&mut self, trading_day: &str) -> WebCtpResult<()> {
-        self.send_op("query_settlement_info", json!({"trading_day": trading_day}))
-            .await
+    pub async fn logout(&mut self, op_ref: &str, user_id: &str) -> WebCtpResult<()> {
+        self.send_op(
+            "logout", 
+            json!({
+                "op_ref": op_ref, 
+                "user_id": user_id
+            })
+        )
+        .await
     }
 
-    pub async fn confirm_settlement_info(&mut self) -> WebCtpResult<()> {
-        self.send_op("confirm_settlement_info", json!({})).await
+    pub async fn query_settlement_info(&mut self, op_ref: &str, trading_day: &str) -> WebCtpResult<()> {
+        self.send_op(
+            "query_settlement_info", 
+            json!({
+                "op_ref": op_ref, 
+                "trading_day": trading_day
+            })
+        )
+        .await
     }
 
-    pub async fn query_trading_account(&mut self) -> WebCtpResult<()> {
-        self.send_op("query_trading_account", json!({})).await
+    pub async fn confirm_settlement_info(&mut self, op_ref: &str) -> WebCtpResult<()> {
+        self.send_op(
+            "confirm_settlement_info", 
+            json!({
+                "op_ref": op_ref
+            })
+        )
+        .await
+    }
+
+    pub async fn query_trading_account(&mut self, op_ref: &str) -> WebCtpResult<()> {
+        self.send_op(
+            "query_trading_account", 
+            json!({
+                "op_ref": op_ref
+            })
+        )
+        .await
     }
 
     #[allow(clippy::too_many_arguments)]
     pub async fn insert_order(
         &mut self,
+        op_ref: &str,
         instrument: &str,
         exchange: &str,
         reference: &str,
@@ -209,6 +263,7 @@ impl TradeClient {
         self.send_op(
             "insert_order",
             json!({
+                "op_ref": op_ref,
                 "instrument": instrument,
                 "exchange": exchange,
                 "ref": reference,
@@ -224,13 +279,15 @@ impl TradeClient {
     }
 
     pub async fn query_order(
-        &mut self,
+        &mut self, 
+        op_ref: &str,
         order_sys_id: Option<String>,
         exchange_id: Option<String>,
         from: Option<String>,
         to: Option<String>,
     ) -> WebCtpResult<()> {
         let mut data = serde_json::Map::new();
+        data.insert("op_ref".into(), json!(op_ref));
         if let Some(v) = order_sys_id {
             data.insert("order_sys_id".into(), json!(v));
         }
@@ -248,6 +305,7 @@ impl TradeClient {
 
     pub async fn delete_order(
         &mut self,
+        op_ref: &str,
         exchange: &str,
         instrument: &str,
         delete_ref: i64,
@@ -256,6 +314,7 @@ impl TradeClient {
         self.send_op(
             "delete_order",
             json!({
+                "op_ref": op_ref,
                 "exchange": exchange,
                 "instrument": instrument,
                 "delete_ref": delete_ref,
@@ -267,12 +326,14 @@ impl TradeClient {
 
     pub async fn query_instrument(
         &mut self,
+        op_ref: &str,
         exchange: Option<String>,
         instrument: Option<String>,
         exchange_inst_id: Option<String>,
         product_id: Option<String>,
     ) -> WebCtpResult<()> {
         let mut data = serde_json::Map::new();
+        data.insert("op_ref".into(), json!(op_ref));
         if let Some(v) = exchange {
             data.insert("exchange".into(), json!(v));
         }
@@ -343,7 +404,7 @@ fn parse_trade(env: Envelope) -> WebCtpResult<TradeEvent> {
                 Ok(TradeMsgCode::Performed) => Ok(TradeEvent::Performed { err, info }),
                 Ok(TradeMsgCode::Error) => Ok(TradeEvent::Error { err }),
                 Ok(TradeMsgCode::ErrorNull) => Ok(TradeEvent::ErrorNull { err }),
-                Ok(TradeMsgCode::ErrorUnknownValue) => Ok(TradeEvent::ErrorUnknownValue { err }),
+                Ok(TradeMsgCode::ErrorUnknownValue) => Ok(TradeEvent::ErrorUnknownValue { err, info }),
                 Ok(TradeMsgCode::Connected) => Ok(TradeEvent::FrontConnected { err, info }),
                 Ok(TradeMsgCode::TradingDay) => {
                     let info: TradeTradingDay = serde_json::from_value(info)?;
