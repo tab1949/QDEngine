@@ -276,6 +276,7 @@ fn serialize_market_event(event: webctp::MarketDataEvent) -> Option<String> {
             ("performed", serde_json::json!({ "err": err, "info": info }))
         }
         webctp::MarketDataEvent::Error { err } => ("error", serde_json::json!({ "err": err })),
+        webctp::MarketDataEvent::ErrorSize { err } => ("error_size", serde_json::json!({ "err": err })),
         webctp::MarketDataEvent::FrontConnected { err, info } => (
             "front_connected",
             serde_json::json!({ "err": err, "info": info }),

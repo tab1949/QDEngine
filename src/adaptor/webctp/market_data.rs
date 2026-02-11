@@ -22,6 +22,7 @@ pub enum MarketDataEvent {
     Subscribe { err: Value, info: MdSubscribe },
     Unsubscribe { err: Value, info: MdUnsubscribe },
     MarketData { err: Value, info: MarketData },
+    ErrorSize { err: Value },
     Unknown { err: Value, raw: Value },
 }
 
@@ -158,6 +159,7 @@ fn parse_market_data(env: Envelope) -> WebCtpResult<MarketDataEvent> {
                     let info: MarketData = serde_json::from_value(info)?;
                     Ok(MarketDataEvent::MarketData { err, info })
                 }
+                Ok(MdMsgCode::ErrorSize) => Ok(MarketDataEvent::ErrorSize { err }),
                 Err(_) => Ok(MarketDataEvent::Unknown {
                     err,
                     raw: json!({"msg_code": code}),

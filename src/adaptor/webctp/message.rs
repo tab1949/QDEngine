@@ -16,6 +16,7 @@ pub enum MdMsgCode {
     Subscribe = 8,
     Unsubscribe = 9,
     MarketData = 10,
+    ErrorSize = 11,
 }
 
 impl TryFrom<i64> for MdMsgCode {
@@ -34,6 +35,7 @@ impl TryFrom<i64> for MdMsgCode {
             8 => Ok(MdMsgCode::Subscribe),
             9 => Ok(MdMsgCode::Unsubscribe),
             10 => Ok(MdMsgCode::MarketData),
+            11 => Ok(MdMsgCode::ErrorSize),
             _ => Err(()),
         }
     }
