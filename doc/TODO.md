@@ -25,12 +25,12 @@ This file lists the tasks to do.
 - [ ] Data Fetching Agent
   - [ ] Abstraction of Local File
   - [ ] Abstraction of Network Data Services
-- [ ] WebCTP Market Data Relaying
-  - [ ] Data Receiving
-  - [ ] Data Sending
+- [x] WebCTP Market Data Relaying
+  - [x] Data Receiving
+  - [x] Data Sending
 - [ ] History Replaying
 - [ ] Trading Service
-  - [ ] Human-Controlled Trading Instruction
+  - [x] Human-Controlled Trading Instruction
   - [ ] Realtime Market Analysis
 
 ## Quantitative Researching
