@@ -30,14 +30,38 @@ This file lists the tasks to do.
   - [x] Data Sending
 - [ ] History Replaying
 - [ ] Trading Service
-  - [x] Human-Controlled Trading Instruction
+  - [ ] Human-Controlled Trading Instruction
   - [ ] Realtime Market Analysis
 
 ## Quantitative Researching
-- [ ] Strategy Module Adaptor
+- [ ] Strategy Module Adaptor 
 - [ ] Event-Driven Trading Simulation Engine
+  - [ ] Parameter Configuration
+  - [ ] Data Fetching
+  - [ ] Data Replay & Simulated Execution
+  - [ ] Feedback 
 
-## Quantitative Trading
+## Trading
+- [ ] Common
+  - [ ] Order Submit/Cancel/Modify/Notify/Query
+  - [ ] Conditional Order
+  - [ ] Account Information Access
+  - [ ] Instrument Information Access
+  - [ ] History Data Interface
+  - [ ] Basic Utility
+    - [ ] Candle Stick Aggregating
+      - [ ] Volume Interval
+      - [ ] Tick Interval
+      - [ ] Time Interval
+    - [ ] Mathematical Functions
+- [ ] Basic Account Access
+  - [ ] Account Information
+  - [ ] Trading Entry
+  - [ ] Profit/Loss Feedback
+  - [ ] Order Info
+  - [ ] Transaction Records
+  - [ ] Position
+- [ ] Market Chart
 - [ ] Strategy Performing
 - [ ] Risk-Controlling
   - [ ] Capital Pool
